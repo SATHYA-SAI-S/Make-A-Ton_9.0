@@ -11,11 +11,7 @@ from backend.app.main import app
 
 @pytest.fixture(autouse=True)
 def setup_db():
-    Base.metadata.create_all(bind=engine)
     db = SessionLocal()
-    # Company in Karnataka (KA)
-    db.add(BillingSettings(id="default", company_state_code="KA", company_name="Brightloop Software"))
-    
     # 18% standard GST rule
     gst_rule = TaxRule(
         name="GST 18%",
@@ -29,7 +25,6 @@ def setup_db():
     db.commit()
     yield
     db.close()
-    Base.metadata.drop_all(bind=engine)
 
 def test_intra_state_split_cgst_sgst():
     # Customer located in same state (KA)

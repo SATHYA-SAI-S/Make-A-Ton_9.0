@@ -42,11 +42,11 @@
 - [x] Automated tests: test_invoices.py
 
 ## Phase 8: Billing Engine with Idempotency & Locking (P2-T07, P2-T08)
-- [ ] Advisory locked billing engine in billing/engine.py
-- [ ] Period calculation across frequencies and missed periods detector
-- [ ] Idempotent period insertion and SubscriptionPort.set_next_billing_date invocation
-- [ ] Billing scheduler, retries with exponential backoff, and dry-run support
-- [ ] Automated tests: test_billing_engine.py
+- [x] Advisory locked billing engine in billing/engine.py
+- [x] Period calculation across frequencies and missed periods detector
+- [x] Idempotent period insertion and SubscriptionPort.set_next_billing_date invocation
+- [x] Billing scheduler, retries with exponential backoff, and dry-run support
+- [x] Automated tests: test_billing_engine.py
 
 ## Phase 9: Payments, Split Allocation & Refunds (P2-T10, P2-T11)
 - [ ] Payment recording across methods (UPI, Card, Bank Transfer, Cash, Other)

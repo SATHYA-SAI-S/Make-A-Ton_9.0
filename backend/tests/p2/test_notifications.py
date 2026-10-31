@@ -48,8 +48,8 @@ def test_notification_mock_send_and_db_record():
     db.close()
 
 def test_notification_failed_send_records_error():
-    # Attempting to connect to invalid port 9999 triggers failure
-    service = NotificationService(smtp_host="127.0.0.1", smtp_port=9999, mock_send=False)
+    service = NotificationService(smtp_host="127.0.0.1", smtp_port=9999)
+    service.force_real_smtp = True
     success = service.send(
         template="payment_failed",
         to="charlie@brightloop.com",

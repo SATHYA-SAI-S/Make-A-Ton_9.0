@@ -25,7 +25,7 @@ class FakeNotificationPort(NotificationPort):
     def __init__(self):
         self.sent_messages = []
 
-    def send(self, template: str, to: str, context: Dict[str, Any], customer_id: Optional[str] = None) -> bool:
+    def send(self, template: str, to: str, context: Dict[str, Any], customer_id: Optional[str] = None, **kwargs) -> bool:
         self.sent_messages.append({"template": template, "to": to, "context": context, "customer_id": customer_id})
         return True
 

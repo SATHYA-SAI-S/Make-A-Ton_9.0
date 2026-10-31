@@ -13,7 +13,7 @@ from backend.app.shared.dto import (
 
 class NotificationPort(ABC):
     @abstractmethod
-    def send(self, template: str, to: str, context: Dict[str, Any], customer_id: Optional[str] = None) -> bool:
+    def send(self, template: str, to: str, context: Dict[str, Any], customer_id: Optional[str] = None, **kwargs) -> bool:
         """Sends transactional notification using Jinja2 template."""
         pass
 
