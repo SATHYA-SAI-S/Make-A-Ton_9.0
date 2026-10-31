@@ -58,3 +58,7 @@ yarn-error.log*
 Thumbs.db
 Desktop.ini
 .DS_Store
+
+# Local Development Binaries
+.tools/
+*.exe

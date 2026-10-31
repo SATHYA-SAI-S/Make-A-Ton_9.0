@@ -35,6 +35,23 @@ class Settings(BaseSettings):
         "http://127.0.0.1:5173",
     ]
 
+    # Email Service Configuration
+    EMAIL_PROVIDER: str = "smtp"
+    SMTP_HOST: str = ""
+    SMTP_PORT: int = 587
+    SMTP_USERNAME: str = ""
+    SMTP_PASSWORD: str = ""
+    SMTP_USE_TLS: bool = True
+    SMTP_USE_SSL: bool = False
+    SMTP_FROM_EMAIL: str = "noreply@subscriptiq.com"
+    SMTP_FROM_NAME: str = "SubscriptIQ"
+    FRONTEND_URL: str = "http://127.0.0.1:5173"
+
+    # Security & OTP Policies
+    OTP_EXPIRE_MINUTES: int = 10
+    OTP_MAX_ATTEMPTS: int = 5
+    OTP_RESEND_COOLDOWN_SECONDS: int = 60
+
     # Seed Admin Defaults
     SEED_ADMIN_EMAIL: str = "admin@subscriptiq.local"
     SEED_ADMIN_PASSWORD: str = "Admin@SecurePassword2026!"

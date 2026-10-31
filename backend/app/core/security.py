@@ -93,3 +93,23 @@ def generate_secure_token() -> str:
 def hash_token(token: str) -> str:
     """Hash a token using SHA256 for secure storage."""
     return hashlib.sha256(token.encode("utf-8")).hexdigest()
+
+
+def generate_secure_otp() -> str:
+    """
+    Generate a cryptographically secure 6-digit numeric OTP (000000 - 999999).
+    Preserves leading zeros.
+    """
+    return f"{secrets.randbelow(1_000_000):06d}"
+
+
+def hash_otp(otp: str) -> str:
+    """Hash an OTP using SHA-256 for secure in-memory or database storage."""
+    return hashlib.sha256(otp.strip().encode("utf-8")).hexdigest()
+
+
+def verify_otp_hash(plain_otp: str, hashed_otp: str) -> bool:
+    """Constant-time verification of plain OTP against its stored SHA-256 hash."""
+    computed = hash_otp(plain_otp)
+    return secrets.compare_digest(computed, hashed_otp)
+

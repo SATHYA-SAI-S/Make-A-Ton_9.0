@@ -1,7 +1,19 @@
 import uuid
 from datetime import datetime
 from typing import Optional
-from pydantic import BaseModel, EmailStr, Field, ConfigDict
+from pydantic import BaseModel, EmailStr, Field, ConfigDict, model_validator
+
+
+def mask_email(email: str) -> str:
+    """Mask email for privacy in user interfaces (e.g., j***e@domain.com)."""
+    if "@" not in email:
+        return email
+    local, domain = email.split("@", 1)
+    if len(local) <= 2:
+        masked_local = local[0] + "*"
+    else:
+        masked_local = local[0] + "*" * (len(local) - 2) + local[-1]
+    return f"{masked_local}@{domain}"
 
 
 class UserResponse(BaseModel):
@@ -22,6 +34,32 @@ class UserRegisterRequest(BaseModel):
     company_name: Optional[str] = None
     country: str = "India"
     timezone: str = "Asia/Kolkata"
+
+
+class RegisterInitiateRequest(UserRegisterRequest):
+    pass
+
+
+class RegisterInitiateResponse(BaseModel):
+    message: str = "A 6-digit verification code has been dispatched to your email address."
+    email: EmailStr
+    masked_email: str
+
+
+class VerifyRegistrationRequest(BaseModel):
+    email: EmailStr
+    otp: str = Field(..., min_length=6, max_length=6, description="6-digit verification OTP")
+
+    @model_validator(mode="before")
+    @classmethod
+    def alias_code_to_otp(cls, values: dict):
+        if isinstance(values, dict) and "code" in values and "otp" not in values:
+            values["otp"] = values["code"]
+        return values
+
+
+class ResendOTPRequest(BaseModel):
+    email: EmailStr
 
 
 class UserLoginRequest(BaseModel):
@@ -45,10 +83,36 @@ class ForgotPasswordRequest(BaseModel):
 
 
 class ForgotPasswordResponse(BaseModel):
-    message: str = "If your email is registered in our system, you will receive password reset instructions."
-    reset_token: Optional[str] = None  # Returned in development mode for easy local verification
+    message: str = "If your email is registered in our system, a 6-digit verification code has been dispatched."
+    email: EmailStr
+    masked_email: str
 
 
+class VerifyResetOTPRequest(BaseModel):
+    email: EmailStr
+    otp: str = Field(..., min_length=6, max_length=6, description="6-digit verification OTP")
+
+    @model_validator(mode="before")
+    @classmethod
+    def alias_code_to_otp(cls, values: dict):
+        if isinstance(values, dict) and "code" in values and "otp" not in values:
+            values["otp"] = values["code"]
+        return values
+
+
+class VerifyResetOTPResponse(BaseModel):
+    message: str = "Verification code confirmed. You may now set your new password."
+    email: EmailStr
+    reset_token: str
+
+
+class ResetPasswordConfirmRequest(BaseModel):
+    email: EmailStr
+    reset_token: str
+    new_password: str = Field(..., min_length=9, description="Minimum 9 chars with upper, lower, and special char")
+
+
+# Backward compatible request
 class ResetPasswordRequest(BaseModel):
     token: str
     new_password: str = Field(..., min_length=9)

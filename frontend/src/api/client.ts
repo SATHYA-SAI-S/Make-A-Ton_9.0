@@ -4,7 +4,11 @@ export interface ApiError {
   details?: Record<string, any>;
 }
 
-const BASE_URL = "http://localhost:8000/api/v1";
+const BASE_URL =
+  (import.meta.env && import.meta.env.VITE_API_BASE_URL) ||
+  (typeof window !== "undefined" && window.location.hostname
+    ? `http://${window.location.hostname}:8000/api/v1`
+    : "http://127.0.0.1:8000/api/v1");
 
 export async function apiRequest<T>(
   endpoint: string,
@@ -20,10 +24,18 @@ export async function apiRequest<T>(
     headers["Authorization"] = `Bearer ${token}`;
   }
 
-  const response = await fetch(`${BASE_URL}${endpoint}`, {
-    ...options,
-    headers,
-  });
+  let response: Response;
+  try {
+    response = await fetch(`${BASE_URL}${endpoint}`, {
+      ...options,
+      headers,
+    });
+  } catch (networkErr: any) {
+    throw {
+      code: "BACKEND_UNAVAILABLE",
+      message: `Unable to connect to SubscriptIQ backend server (${BASE_URL}). Please verify the server is running on port 8000.`,
+    };
+  }
 
   if (response.status === 401) {
     // Attempt token refresh if available

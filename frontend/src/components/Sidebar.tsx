@@ -1,5 +1,6 @@
 import React from "react";
 import {
+  LayoutDashboard,
   Users,
   Package,
   Calendar,
@@ -18,26 +19,40 @@ interface SidebarProps {
 
 export const Sidebar: React.FC<SidebarProps> = ({ currentTab, onSelectTab }) => {
   const { user, logout } = useAuth();
-  const isAdmin = user?.role === "admin";
-  const isCustomer = user?.role === "customer";
+  const role = user?.role || "customer";
 
   const adminNavItems = [
+    { id: "dashboard", label: "Admin Overview", icon: LayoutDashboard },
     { id: "customers", label: "Customers", icon: Users },
     { id: "catalogue", label: "Products & Variants", icon: Package },
     { id: "plans", label: "Subscription Plans", icon: Calendar },
     { id: "quotations", label: "Quotations", icon: FileText },
     { id: "subscriptions", label: "Subscriptions", icon: Repeat },
-    ...(isAdmin ? [{ id: "staff", label: "Staff Management", icon: ShieldCheck }] : []),
+    { id: "staff", label: "Staff Management", icon: ShieldCheck },
+  ];
+
+  const staffNavItems = [
+    { id: "staff-dashboard", label: "Staff Workspace", icon: LayoutDashboard },
+    { id: "customers", label: "Customers", icon: Users },
+    { id: "catalogue", label: "Products & Variants", icon: Package },
+    { id: "plans", label: "Subscription Plans", icon: Calendar },
+    { id: "quotations", label: "Quotations", icon: FileText },
+    { id: "subscriptions", label: "Subscriptions", icon: Repeat },
   ];
 
   const customerNavItems = [
     { id: "portal", label: "Customer Portal", icon: UserCheck },
   ];
 
-  const items = isCustomer ? customerNavItems : adminNavItems;
+  const items =
+    role === "admin"
+      ? adminNavItems
+      : role === "staff"
+      ? staffNavItems
+      : customerNavItems;
 
   return (
-    <aside className="w-64 bg-slate-900 text-slate-300 flex flex-col justify-between min-h-screen">
+    <aside className="w-64 bg-slate-900 text-slate-300 flex flex-col justify-between min-h-screen shrink-0 border-r border-slate-800">
       <div>
         <div className="p-6 flex items-center gap-3 border-b border-slate-800">
           <div className="w-10 h-10 rounded-lg bg-emerald-500 flex items-center justify-center text-white font-bold text-xl shadow-lg shadow-emerald-500/20">
@@ -46,7 +61,7 @@ export const Sidebar: React.FC<SidebarProps> = ({ currentTab, onSelectTab }) => 
           <div>
             <h1 className="text-lg font-bold text-white tracking-tight">SubscriptIQ</h1>
             <p className="text-xs text-slate-400 font-medium capitalize">
-              {user?.role} Workspace
+              {role} Workspace
             </p>
           </div>
         </div>
@@ -75,7 +90,8 @@ export const Sidebar: React.FC<SidebarProps> = ({ currentTab, onSelectTab }) => 
 
       <div className="p-4 border-t border-slate-800">
         <div className="mb-3 px-2">
-          <p className="text-xs text-slate-400 truncate">{user?.email}</p>
+          <span className="text-[10px] uppercase font-semibold text-slate-500 tracking-wider block">Logged in as</span>
+          <p className="text-xs text-slate-300 font-medium truncate">{user?.email}</p>
         </div>
         <button
           onClick={logout}

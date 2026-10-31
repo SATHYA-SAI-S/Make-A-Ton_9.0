@@ -14,6 +14,7 @@ import app.quotations.models
 import app.subscriptions.models
 
 from app.auth.router import auth_router, staff_router
+from app.admin.router import admin_router
 from app.customers.router import customers_router
 from app.catalogue.router import catalogue_router
 from app.quotations.router import quotations_router
@@ -37,6 +38,7 @@ app = FastAPI(
 app.add_middleware(
     CORSMiddleware,
     allow_origins=settings.CORS_ORIGINS,
+    allow_origin_regex=r"^https?://(localhost|127\.0\.0\.1)(:\d+)?$",
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
@@ -58,6 +60,7 @@ def health_check():
 # Register Routers under /api/v1
 app.include_router(auth_router, prefix=settings.API_V1_PREFIX)
 app.include_router(staff_router, prefix=settings.API_V1_PREFIX)
+app.include_router(admin_router, prefix=settings.API_V1_PREFIX)
 app.include_router(customers_router, prefix=settings.API_V1_PREFIX)
 app.include_router(catalogue_router, prefix=settings.API_V1_PREFIX)
 app.include_router(quotations_router, prefix=settings.API_V1_PREFIX)

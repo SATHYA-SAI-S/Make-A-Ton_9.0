@@ -14,6 +14,13 @@ interface AuthContextType {
   role: string | null;
   login: (email: string, password: string) => Promise<void>;
   register: (payload: any) => Promise<void>;
+  initiateRegistration: (payload: any) => Promise<any>;
+  resendRegistrationOtp: (email: string) => Promise<any>;
+  verifyRegistration: (email: string, otp: string) => Promise<void>;
+  forgotPassword: (email: string) => Promise<any>;
+  resendForgotPasswordOtp: (email: string) => Promise<any>;
+  verifyForgotPasswordOtp: (email: string, otp: string) => Promise<any>;
+  confirmResetPassword: (email: string, resetToken: string, newPassword: string) => Promise<any>;
   logout: () => void;
   isLoading: boolean;
 }
@@ -61,6 +68,60 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     setUser(data.user);
   };
 
+  const initiateRegistration = async (payload: any) => {
+    return await apiRequest("/auth/register/initiate", {
+      method: "POST",
+      body: JSON.stringify(payload),
+    });
+  };
+
+  const resendRegistrationOtp = async (email: string) => {
+    return await apiRequest("/auth/register/resend", {
+      method: "POST",
+      body: JSON.stringify({ email }),
+    });
+  };
+
+  const verifyRegistration = async (email: string, otp: string) => {
+    const data: any = await apiRequest("/auth/register/verify", {
+      method: "POST",
+      body: JSON.stringify({ email, otp }),
+    });
+    localStorage.setItem("subscriptiq_access_token", data.access_token);
+    localStorage.setItem("subscriptiq_refresh_token", data.refresh_token);
+    localStorage.setItem("subscriptiq_user", JSON.stringify(data.user));
+    setToken(data.access_token);
+    setUser(data.user);
+  };
+
+  const forgotPassword = async (email: string) => {
+    return await apiRequest("/auth/forgot-password", {
+      method: "POST",
+      body: JSON.stringify({ email }),
+    });
+  };
+
+  const resendForgotPasswordOtp = async (email: string) => {
+    return await apiRequest("/auth/forgot-password/resend", {
+      method: "POST",
+      body: JSON.stringify({ email }),
+    });
+  };
+
+  const verifyForgotPasswordOtp = async (email: string, otp: string) => {
+    return await apiRequest("/auth/forgot-password/verify-otp", {
+      method: "POST",
+      body: JSON.stringify({ email, otp }),
+    });
+  };
+
+  const confirmResetPassword = async (email: string, resetToken: string, newPassword: string) => {
+    return await apiRequest("/auth/forgot-password/confirm", {
+      method: "POST",
+      body: JSON.stringify({ email, reset_token: resetToken, new_password: newPassword }),
+    });
+  };
+
   const logout = () => {
     localStorage.removeItem("subscriptiq_access_token");
     localStorage.removeItem("subscriptiq_refresh_token");
@@ -77,6 +138,13 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         role: user?.role || null,
         login,
         register,
+        initiateRegistration,
+        resendRegistrationOtp,
+        verifyRegistration,
+        forgotPassword,
+        resendForgotPasswordOtp,
+        verifyForgotPasswordOtp,
+        confirmResetPassword,
         logout,
         isLoading,
       }}
