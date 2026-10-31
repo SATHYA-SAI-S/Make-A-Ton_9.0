@@ -63,8 +63,8 @@
 - [x] Automated tests: test_overdue_reconciliation.py
 
 ## Phase 11: Frontend Module (P2-T14)
-- [ ] React + TypeScript views: Taxes, Discounts, Billing Control, Invoices, Payments, Overdue, Reconciliation
-- [ ] Component tests with Vitest and E2E Playwright tests in e2e/p2/
+- [x] React + TypeScript views: Taxes, Discounts, Billing Control, Invoices, Payments, Overdue, Reconciliation
+- [x] Component tests with Vitest and E2E Playwright tests in e2e/p2/
 
 ## Phase 12: Views, Hardening & Final Documentation (P2-T15)
 - [ ] Read-optimized SQL views: v_invoice_summary, v_payment_summary, v_outstanding
