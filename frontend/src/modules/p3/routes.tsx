@@ -7,6 +7,11 @@ import { MyInvoices } from './pages/portal/MyInvoices';
 import { PaymentHistory } from './pages/portal/PaymentHistory';
 import { CustomerProfilePage } from './pages/portal/CustomerProfile';
 import { SubscriptionTimeline } from './pages/portal/SubscriptionTimeline';
+import { FinanceOverview } from './pages/finance/FinanceOverview';
+import { RevenueAnalytics } from './pages/finance/RevenueAnalytics';
+import { SubscriptionAnalytics } from './pages/finance/SubscriptionAnalytics';
+import { CollectionAnalytics } from './pages/finance/CollectionAnalytics';
+import { DrilldownInvoices } from './pages/finance/DrilldownInvoices';
 
 export const routes: RouteObject[] = [
   {
@@ -40,5 +45,29 @@ export const routes: RouteObject[] = [
   {
     path: '/portal/timeline',
     element: <SubscriptionTimeline />,
+  },
+  {
+    path: '/p3/finance',
+    element: <FinanceOverview />,
+  },
+  {
+    path: '/p3/finance/overview',
+    element: <FinanceOverview />,
+  },
+  {
+    path: '/p3/finance/revenue',
+    element: <RevenueAnalytics />,
+  },
+  {
+    path: '/p3/finance/subscriptions',
+    element: <SubscriptionAnalytics />,
+  },
+  {
+    path: '/p3/finance/collections',
+    element: <CollectionAnalytics />,
+  },
+  {
+    path: '/p3/finance/invoices',
+    element: <DrilldownInvoices />,
   },
 ];

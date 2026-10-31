@@ -10,6 +10,9 @@ export const nav: NavItem[] = [
   { label: 'My Invoices', path: '/portal/invoices', module: 'p3' },
   { label: 'Payment Ledger', path: '/portal/payments', module: 'p3' },
   { label: 'Account Profile', path: '/portal/profile', module: 'p3' },
-  { label: 'Activity Timeline', path: '/portal/timeline', module: 'p3' },
+  { label: 'Finance Intelligence', path: '/p3/finance', module: 'p3' },
+  { label: 'Revenue Analytics', path: '/p3/finance/revenue', module: 'p3' },
+  { label: 'Subscription Analytics', path: '/p3/finance/subscriptions', module: 'p3' },
+  { label: 'Collection & Risk', path: '/p3/finance/collections', module: 'p3' },
   { label: 'UI Demo', path: '/ui-demo', module: 'p3' },
 ];

@@ -123,10 +123,12 @@ def on_financial_event_trigger(event) -> None:
     try:
         # Invalidate cache immediately
         invalidate_cache()
-        # Refresh current month snapshot
-        today = date.today()
-        current_period = f"{today.year:04d}-{today.month:02d}"
-        rebuild_revenue_snapshots(period=current_period)
+        # In production with background workers enabled, rebuild snapshot
+        import os
+        if os.environ.get("ENABLE_BACKGROUND_SNAPSHOT_TRIGGERS", "false").lower() == "true":
+            today = date.today()
+            current_period = f"{today.year:04d}-{today.month:02d}"
+            rebuild_revenue_snapshots(period=current_period)
     except Exception as e:
         logger.error(f"Event trigger snapshot rebuild error: {e}")
 

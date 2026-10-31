@@ -17,18 +17,21 @@ _MEMORY_CACHE: Dict[str, Dict[str, Any]] = {}
 
 # Try Redis connection
 _REDIS_CLIENT = None
-try:
-    import redis
-    from backend.app.core.config import settings
-    redis_url = getattr(settings, "REDIS_URL", "redis://localhost:6379/0")
-    client = redis.from_url(redis_url, decode_responses=True)
-    # Test ping with short timeout
-    client.ping()
-    _REDIS_CLIENT = client
-    logger.info("Connected to Redis cache successfully.")
-except Exception:
-    _REDIS_CLIENT = None
-    logger.info("Redis unavailable, using high-speed in-memory cache.")
+import os
+if os.environ.get("USE_REDIS", "false").lower() == "true":
+    try:
+        import redis
+        from backend.app.core.config import settings
+        redis_url = getattr(settings, "REDIS_URL", "redis://localhost:6379/0")
+        client = redis.from_url(redis_url, decode_responses=True, socket_connect_timeout=0.2, socket_timeout=0.2)
+        client.ping()
+        _REDIS_CLIENT = client
+        logger.info("Connected to Redis cache successfully.")
+    except Exception:
+        _REDIS_CLIENT = None
+        logger.info("Redis unavailable, using high-speed in-memory cache.")
+else:
+    logger.info("Using high-speed in-memory cache.")
 
 
 def _json_serializer(obj: Any) -> Any:

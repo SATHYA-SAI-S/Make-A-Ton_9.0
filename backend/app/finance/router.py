@@ -11,9 +11,11 @@ from backend.app.core.database import get_db
 from backend.app.core.security import UserClaims, require_roles
 from backend.app.finance.overview import get_finance_overview_data
 from backend.app.finance.charts_router import charts_router
+from backend.app.finance.export import export_router
 
 router = APIRouter()
 router.include_router(charts_router, prefix="/charts", tags=["Finance Charts"])
+router.include_router(export_router, tags=["Finance Export"])
 
 
 @router.get("/overview", summary="Get Finance Intelligence Overview KPIs")
