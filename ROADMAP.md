@@ -24,10 +24,10 @@
 - [x] Automated tests: test_discounts.py
 
 ## Phase 5: Pricing Calculator (P2-T04)
-- [ ] Pure logic Decimal pricing calculator in billing/calculator.py
-- [ ] Strict calculation order and zero-float enforcement
-- [ ] Documentation docs/p2/calculation.md
-- [ ] Automated tests: test_calculator.py
+- [x] Pure logic Decimal pricing calculator in billing/calculator.py
+- [x] Strict calculation order and zero-float enforcement
+- [x] Documentation docs/p2/calculation.md
+- [x] Automated tests: test_calculator.py
 
 ## Phase 6: Billing & Invoice Database Models & Migration (P2-T05)
 - [ ] Billing models: billing_runs, billing_run_items, billing_periods, invoices, invoice_lines, payments, payment_allocations, billing_settings
