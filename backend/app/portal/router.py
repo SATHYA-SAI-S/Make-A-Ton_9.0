@@ -15,8 +15,12 @@ from backend.app.portal.schemas import (
     PortalOutstandingBalanceResponse,
 )
 from backend.app.portal import service
+from backend.app.portal.requests_router import router as requests_sub_router, admin_router as requests_admin_sub_router
 
 router = APIRouter()
+
+router.include_router(requests_sub_router, prefix="/requests", tags=["Customer Requests"])
+router.include_router(requests_admin_sub_router, prefix="/admin/requests", tags=["Customer Requests Admin"])
 
 @router.get("/dashboard", response_model=PortalDashboardSummary, summary="Customer Portal Dashboard Summary")
 def get_dashboard(
