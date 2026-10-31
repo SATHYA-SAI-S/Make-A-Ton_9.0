@@ -67,6 +67,6 @@
 - [x] Component tests with Vitest and E2E Playwright tests in e2e/p2/
 
 ## Phase 12: Views, Hardening & Final Documentation (P2-T15)
-- [ ] Read-optimized SQL views: v_invoice_summary, v_payment_summary, v_outstanding
-- [ ] Documentation docs/p2/api.md and docs/p2/views.md
-- [ ] Codebase audit: zero float check, secret leak check, error consistency
+- [x] Read-optimized SQL views: v_invoice_summary, v_payment_summary, v_outstanding
+- [x] Documentation docs/p2/api.md and docs/p2/views.md
+- [x] Codebase audit: zero float check, secret leak check, error consistency

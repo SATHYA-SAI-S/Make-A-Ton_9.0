@@ -8,11 +8,10 @@ from backend.app.billing.models import BillingPeriod, BillingRun, BillingRunItem
 from backend.app.invoices.models import Invoice, InvoiceLine
 from backend.app.payments.models import Payment, PaymentAllocation
 
-@pytest.fixture(autouse=True)
-def setup_db():
-    Base.metadata.create_all(bind=engine)
-    yield
-    Base.metadata.drop_all(bind=engine)
+from sqlalchemy import text
+from alembic.migration import MigrationContext
+from alembic.operations import Operations
+import backend.migrations.versions_p2.p2_0002_analytics_views as views_mig
 
 def test_unique_billing_period_constraint():
     db = SessionLocal()
@@ -87,4 +86,21 @@ def test_payment_and_allocation_integrity():
     db.refresh(pay)
     assert len(pay.allocations) == 1
     assert pay.allocations[0].amount == Decimal("800.00")
+    db.close()
+
+def test_analytics_views_compilation_and_querying():
+    with engine.begin() as conn:
+        ctx = MigrationContext.configure(conn)
+        with Operations.context(ctx):
+            views_mig.upgrade()
+
+    db = SessionLocal()
+    # Test all 3 Person 3 views
+    c_inv = db.execute(text("SELECT COUNT(*) FROM v_invoice_summary")).scalar()
+    c_pay = db.execute(text("SELECT COUNT(*) FROM v_payment_summary")).scalar()
+    c_out = db.execute(text("SELECT COUNT(*) FROM v_outstanding")).scalar()
+
+    assert c_inv >= 0
+    assert c_pay >= 0
+    assert c_out >= 0
     db.close()
