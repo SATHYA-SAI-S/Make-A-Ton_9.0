@@ -9,6 +9,7 @@ __pycache__/
 build/
 develop-eggs/
 dist/
+dist-ssr/
 downloads/
 eggs/
 .eggs/
@@ -24,6 +25,7 @@ wheels/
 
 # Virtual environments
 .env
+.env.local
 .venv
 .venv/
 env/
@@ -53,12 +55,16 @@ node_modules/
 npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
+*.local
 
 # OS specific
 Thumbs.db
+ehthumbs.db
 Desktop.ini
+$RECYCLE.BIN/
 .DS_Store
 
 # Local Development Binaries
 .tools/
 *.exe
+

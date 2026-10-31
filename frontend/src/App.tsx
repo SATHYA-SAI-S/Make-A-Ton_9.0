@@ -1,4 +1,7 @@
 import React, { useState, useEffect } from "react";
+import { BrowserRouter as Router } from "react-router-dom";
+import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+import { ToastProvider } from "@/shared/ui";
 import { AuthProvider, useAuth } from "./context/AuthContext";
 import { AuthPage } from "./modules/auth/AuthPages";
 import { Sidebar } from "./components/Sidebar";
@@ -13,6 +16,22 @@ import { StaffPage } from "./modules/staff/StaffPage";
 import { CustomerPortalPage } from "./modules/portal/CustomerPortalPage";
 
 import { BillingModule } from "./modules/p2";
+
+import { FinanceOverview } from "./modules/p3/pages/finance/FinanceOverview";
+import { ForecastSimulatorPage } from "./modules/p3/pages/finance/ForecastSimulatorPage";
+import { RevenueGuardianDashboard } from "./modules/p3/pages/guardian/RevenueGuardianDashboard";
+import { AuditViewer } from "./modules/p3/pages/audit/AuditViewer";
+import { FinancialReportsPage } from "./modules/p3/pages/reports/FinancialReportsPage";
+import { CustomerDashboard } from "./modules/p3/pages/portal/CustomerDashboard";
+
+const queryClient = new QueryClient({
+  defaultOptions: {
+    queries: {
+      staleTime: 1000 * 60 * 5,
+      retry: 1,
+    },
+  },
+});
 
 const getDefaultTabForRole = (role?: string) => {
   if (role === "admin") return "dashboard";
@@ -34,7 +53,12 @@ const DashboardLayout: React.FC = () => {
       <Sidebar currentTab={currentTab} onSelectTab={setCurrentTab} />
       <main className="flex-1 overflow-y-auto">
         {/* Customer View */}
-        {role === "customer" && <CustomerPortalPage />}
+        {role === "customer" && (
+          <>
+            {currentTab === "portal" && <CustomerPortalPage />}
+            {currentTab === "p3-portal" && <CustomerDashboard />}
+          </>
+        )}
 
         {/* Staff Views */}
         {role === "staff" && (
@@ -46,8 +70,12 @@ const DashboardLayout: React.FC = () => {
             {currentTab === "quotations" && <QuotationsPage />}
             {currentTab === "subscriptions" && <SubscriptionsPage />}
             {currentTab === "billing" && <BillingModule />}
-            {/* If tab not allowed for staff, fallback to staff-dashboard */}
-            {["dashboard", "staff", "portal"].includes(currentTab) && (
+            {currentTab === "finance" && <FinanceOverview />}
+            {currentTab === "forecast" && <ForecastSimulatorPage />}
+            {currentTab === "guardian" && <RevenueGuardianDashboard />}
+            {currentTab === "audit" && <AuditViewer />}
+            {currentTab === "reports" && <FinancialReportsPage />}
+            {["dashboard", "staff", "portal", "p3-portal"].includes(currentTab) && (
               <StaffDashboard onNavigate={setCurrentTab} />
             )}
           </>
@@ -63,9 +91,13 @@ const DashboardLayout: React.FC = () => {
             {currentTab === "quotations" && <QuotationsPage />}
             {currentTab === "subscriptions" && <SubscriptionsPage />}
             {currentTab === "billing" && <BillingModule />}
+            {currentTab === "finance" && <FinanceOverview />}
+            {currentTab === "forecast" && <ForecastSimulatorPage />}
+            {currentTab === "guardian" && <RevenueGuardianDashboard />}
+            {currentTab === "audit" && <AuditViewer />}
+            {currentTab === "reports" && <FinancialReportsPage />}
             {currentTab === "staff" && <StaffPage />}
-            {/* If admin navigates to non-admin tab */}
-            {["staff-dashboard", "portal"].includes(currentTab) && (
+            {["staff-dashboard", "portal", "p3-portal"].includes(currentTab) && (
               <AdminDashboard onNavigate={setCurrentTab} />
             )}
           </>
@@ -74,7 +106,6 @@ const DashboardLayout: React.FC = () => {
     </div>
   );
 };
-
 
 const MainApp: React.FC = () => {
   const { user, isLoading } = useAuth();
@@ -96,8 +127,14 @@ const MainApp: React.FC = () => {
 
 export default function App() {
   return (
-    <AuthProvider>
-      <MainApp />
-    </AuthProvider>
+    <QueryClientProvider client={queryClient}>
+      <ToastProvider>
+        <Router>
+          <AuthProvider>
+            <MainApp />
+          </AuthProvider>
+        </Router>
+      </ToastProvider>
+    </QueryClientProvider>
   );
 }

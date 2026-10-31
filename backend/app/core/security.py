@@ -7,7 +7,8 @@ from typing import Any, Dict, List, Optional, Tuple
 import jwt
 from argon2 import PasswordHasher
 from argon2.exceptions import VerifyMismatchError, VerificationError, InvalidHashError
-from fastapi import Depends, Header, HTTPException, status
+from fastapi import Depends, Header, HTTPException, Security, status
+from fastapi.security import HTTPAuthorizationCredentials, HTTPBearer
 from pydantic import BaseModel
 
 try:
@@ -16,6 +17,7 @@ except ImportError:
     from app.core.config import settings
 
 _ph = PasswordHasher()
+security_bearer = HTTPBearer(auto_error=False)
 
 
 def hash_password(password: str) -> str:
@@ -119,30 +121,98 @@ def verify_otp_hash(plain_otp: str, hashed_otp: str) -> bool:
     return secrets.compare_digest(computed, hashed_otp)
 
 
-class UserContext(BaseModel):
+class UserClaims(BaseModel):
+    id: str = "dev-user-admin"
     user_id: str = "dev-user-admin"
     email: str = "admin@brightloop.com"
     role: str = "admin"  # admin, staff, customer
     customer_id: Optional[str] = "cust-dev-001"
+    is_active: bool = True
+
+    def __init__(self, **data):
+        if "id" in data and "user_id" not in data:
+            data["user_id"] = data["id"]
+        elif "user_id" in data and "id" not in data:
+            data["id"] = data["user_id"]
+        super().__init__(**data)
+
+
+UserContext = UserClaims
+
+DEV_USERS = {
+    "dev-admin-token": UserClaims(
+        id="usr-admin-001",
+        email="admin@brightloop.com",
+        role="admin"
+    ),
+    "dev-staff-token": UserClaims(
+        id="usr-staff-001",
+        email="finance@brightloop.com",
+        role="staff"
+    ),
+    "dev-customer-token": UserClaims(
+        id="usr-cust-001",
+        email="billing@acme.com",
+        role="customer",
+        customer_id="cust-101"
+    ),
+    "dev-customer-2-token": UserClaims(
+        id="usr-cust-002",
+        email="ops@techcorp.com",
+        role="customer",
+        customer_id="cust-102"
+    )
+}
 
 
 def current_user(
     authorization: Optional[str] = Header(None),
-    x_user_role: Optional[str] = Header("admin"),
-    x_user_id: Optional[str] = Header("dev-user-admin"),
-    x_customer_id: Optional[str] = Header(None)
-) -> UserContext:
-    """Dev user context resolver allowing easy testing across roles."""
-    return UserContext(
-        user_id=x_user_id or "dev-user-admin",
-        email=f"{x_user_role}@brightloop.com",
-        role=x_user_role or "admin",
-        customer_id=x_customer_id or ("cust-dev-001" if x_user_role == "customer" else None)
-    )
+    x_user_role: Optional[str] = Header(None),
+    x_user_id: Optional[str] = Header(None),
+    x_customer_id: Optional[str] = Header(None),
+    credentials: Optional[HTTPAuthorizationCredentials] = Security(security_bearer)
+) -> UserClaims:
+    """User context resolver supporting dev headers, test tokens, or fallback."""
+    raw_token = None
+    if credentials and credentials.credentials:
+        raw_token = credentials.credentials
+    elif authorization and authorization.startswith("Bearer "):
+        raw_token = authorization.split(" ")[1]
+
+    if raw_token and raw_token in DEV_USERS:
+        return DEV_USERS[raw_token]
+
+    if raw_token and raw_token.startswith("test-"):
+        parts = raw_token.split(":")
+        role = parts[1] if len(parts) > 1 else "customer"
+        cid = parts[2] if len(parts) > 2 else "cust-101"
+        return UserClaims(
+            id=f"usr-{role}-01",
+            user_id=f"usr-{role}-01",
+            email=f"{role}@example.com",
+            role=role,
+            customer_id=cid if role == "customer" else None
+        )
+
+    # Check headers
+    if x_user_role or x_user_id or x_customer_id:
+        role = x_user_role or "admin"
+        return UserClaims(
+            id=x_user_id or "dev-user-admin",
+            user_id=x_user_id or "dev-user-admin",
+            email=f"{role}@brightloop.com",
+            role=role,
+            customer_id=x_customer_id or ("cust-dev-001" if role == "customer" else None)
+        )
+
+    return DEV_USERS["dev-admin-token"]
+
+
+get_current_user = current_user
 
 
 def require_roles(*allowed_roles: str):
-    def role_checker(user: UserContext = Depends(current_user)):
+    def role_checker(user: UserClaims = Depends(current_user)):
         if user.role not in allowed_roles and user.role != "admin":
             raise HTTPException(
                 status_code=status.HTTP_403_FORBIDDEN,
@@ -152,7 +222,7 @@ def require_roles(*allowed_roles: str):
     return role_checker
 
 
-def require_customer_owner(customer_id: str, user: UserContext = Depends(current_user)):
+def require_customer_owner(customer_id: str = "customer_id", user: UserClaims = Depends(current_user)):
     if user.role == "customer" and user.customer_id != customer_id:
         raise HTTPException(
             status_code=status.HTTP_403_FORBIDDEN,

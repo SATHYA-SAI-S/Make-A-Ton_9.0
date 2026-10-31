@@ -9,6 +9,11 @@ import {
   Receipt,
   ShieldCheck,
   UserCheck,
+  TrendingUp,
+  LineChart,
+  ShieldAlert,
+  History,
+  FileSpreadsheet,
   LogOut
 } from "lucide-react";
 import { useAuth } from "../context/AuthContext";
@@ -30,6 +35,11 @@ export const Sidebar: React.FC<SidebarProps> = ({ currentTab, onSelectTab }) => 
     { id: "quotations", label: "Quotations", icon: FileText },
     { id: "subscriptions", label: "Subscriptions", icon: Repeat },
     { id: "billing", label: "Billing & Invoices", icon: Receipt },
+    { id: "finance", label: "Finance & KPIs", icon: TrendingUp },
+    { id: "forecast", label: "Forecast Simulator", icon: LineChart },
+    { id: "guardian", label: "Revenue Guardian", icon: ShieldAlert },
+    { id: "audit", label: "Audit Trail", icon: History },
+    { id: "reports", label: "Financial Reports", icon: FileSpreadsheet },
     { id: "staff", label: "Staff Management", icon: ShieldCheck },
   ];
 
@@ -41,11 +51,16 @@ export const Sidebar: React.FC<SidebarProps> = ({ currentTab, onSelectTab }) => 
     { id: "quotations", label: "Quotations", icon: FileText },
     { id: "subscriptions", label: "Subscriptions", icon: Repeat },
     { id: "billing", label: "Billing & Invoices", icon: Receipt },
+    { id: "finance", label: "Finance & KPIs", icon: TrendingUp },
+    { id: "forecast", label: "Forecast Simulator", icon: LineChart },
+    { id: "guardian", label: "Revenue Guardian", icon: ShieldAlert },
+    { id: "audit", label: "Audit Trail", icon: History },
+    { id: "reports", label: "Financial Reports", icon: FileSpreadsheet },
   ];
-
 
   const customerNavItems = [
     { id: "portal", label: "Customer Portal", icon: UserCheck },
+    { id: "p3-portal", label: "Intelligence & History", icon: TrendingUp },
   ];
 
   const items =

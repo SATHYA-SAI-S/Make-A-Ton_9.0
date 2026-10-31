@@ -22,15 +22,20 @@ class Settings(_BaseSettings):
     ENVIRONMENT: str = os.getenv("ENVIRONMENT", "development")
     DEBUG: bool = os.getenv("DEBUG", "True").lower() in ("true", "1")
     API_V1_PREFIX: str = os.getenv("API_V1_PREFIX", "/api/v1")
+    API_V1_STR: str = os.getenv("API_V1_PREFIX", "/api/v1")
 
     # Database
     DATABASE_URL: str = os.getenv("DATABASE_URL", "sqlite:///./subscriptiq.db")
     TEST_DATABASE_URL: str = os.getenv("TEST_DATABASE_URL", "sqlite:///:memory:")
 
+    # Redis & Cache
+    REDIS_URL: str = os.getenv("REDIS_URL", "redis://localhost:6379/0")
+
     # Security & JWT
     SECRET_KEY: str = os.getenv("SECRET_KEY", "dev-secret-key-subscriptiq-change-in-production-2026-secure")
     JWT_SECRET_KEY: str = os.getenv("JWT_SECRET_KEY", "dev-secret-key-subscriptiq-change-in-production-2026-secure")
     JWT_ALGORITHM: str = "HS256"
+    ALGORITHM: str = "HS256"
     ACCESS_TOKEN_EXPIRE_MINUTES: int = 60
     REFRESH_TOKEN_EXPIRE_DAYS: int = 7
 
@@ -42,6 +47,11 @@ class Settings(_BaseSettings):
         "http://localhost:3000",
         "http://localhost:5173",
         "http://127.0.0.1:3000",
+        "http://127.0.0.1:5173",
+    ]
+    BACKEND_CORS_ORIGINS: List[str] = [
+        "http://localhost:3000",
+        "http://localhost:5173",
         "http://127.0.0.1:5173",
     ]
 

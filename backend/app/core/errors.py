@@ -34,30 +34,62 @@ class AppException(Exception):
         self.details = details or {}
         super().__init__(self.message)
 
+    def to_dict(self) -> Dict[str, Any]:
+        return {
+            "error": {
+                "code": self.code,
+                "message": self.message,
+                "details": self.details,
+            }
+        }
 
-class NotFoundException(AppException):
+    def to_response(self) -> JSONResponse:
+        return JSONResponse(status_code=self.status_code, content=self.to_dict())
+
+
+class SubscriptIQError(AppException):
+    def __init__(
+        self,
+        code: str,
+        message: str,
+        status_code: int = status.HTTP_400_BAD_REQUEST,
+        details: Optional[Dict[str, Any]] = None
+    ):
+        super().__init__(arg1=code, arg2=message, status_code=status_code, details=details, code=code, message=message)
+
+
+class NotFoundException(SubscriptIQError):
     def __init__(self, message: str = "Resource not found", code: str = "NOT_FOUND", details: Optional[Dict[str, Any]] = None, **kwargs):
-        super().__init__(arg1=code, arg2=message, status_code=status.HTTP_404_NOT_FOUND, details=details, code=code, message=message)
+        super().__init__(code=code, message=message, status_code=status.HTTP_404_NOT_FOUND, details=details)
 
 
-class UnauthorizedException(AppException):
+class UnauthorizedException(SubscriptIQError):
     def __init__(self, message: str = "Unauthorized", code: str = "UNAUTHORIZED", details: Optional[Dict[str, Any]] = None, **kwargs):
-        super().__init__(arg1=code, arg2=message, status_code=status.HTTP_401_UNAUTHORIZED, details=details, code=code, message=message)
+        super().__init__(code=code, message=message, status_code=status.HTTP_401_UNAUTHORIZED, details=details)
 
 
-class ForbiddenException(AppException):
+class ForbiddenException(SubscriptIQError):
     def __init__(self, message: str = "Access forbidden", code: str = "FORBIDDEN", details: Optional[Dict[str, Any]] = None, **kwargs):
-        super().__init__(arg1=code, arg2=message, status_code=status.HTTP_403_FORBIDDEN, details=details, code=code, message=message)
+        super().__init__(code=code, message=message, status_code=status.HTTP_403_FORBIDDEN, details=details)
 
 
-class ConflictException(AppException):
+class PermissionDeniedError(SubscriptIQError):
+    def __init__(self, message: str = "Access denied."):
+        super().__init__(
+            code="PERMISSION_DENIED",
+            message=message,
+            status_code=status.HTTP_403_FORBIDDEN
+        )
+
+
+class ConflictException(SubscriptIQError):
     def __init__(self, message: str = "Conflict", code: str = "CONFLICT", details: Optional[Dict[str, Any]] = None, **kwargs):
-        super().__init__(arg1=code, arg2=message, status_code=status.HTTP_409_CONFLICT, details=details, code=code, message=message)
+        super().__init__(code=code, message=message, status_code=status.HTTP_409_CONFLICT, details=details)
 
 
-class ValidationException(AppException):
+class ValidationException(SubscriptIQError):
     def __init__(self, message: str = "Validation error", code: str = "VALIDATION_ERROR", details: Optional[Dict[str, Any]] = None, **kwargs):
-        super().__init__(arg1=code, arg2=message, status_code=status.HTTP_422_UNPROCESSABLE_ENTITY, details=details, code=code, message=message)
+        super().__init__(code=code, message=message, status_code=status.HTTP_422_UNPROCESSABLE_ENTITY, details=details)
 
 
 # Aliases
@@ -72,18 +104,13 @@ ValidationError = ValidationException
 async def app_exception_handler(request: Request, exc: AppException):
     return JSONResponse(
         status_code=exc.status_code,
-        content={
-            "error": {
-                "code": exc.code,
-                "message": exc.message,
-                "details": exc.details
-            }
-        }
+        content=exc.to_dict()
     )
 
 
 def register_error_handlers(app: FastAPI) -> None:
     app.add_exception_handler(AppException, app_exception_handler)
+    app.add_exception_handler(SubscriptIQError, app_exception_handler)
 
     @app.exception_handler(RequestValidationError)
     async def validation_exception_handler(request: Request, exc: RequestValidationError):

@@ -52,6 +52,14 @@ class BaseModel(Base):
     updated_at = Column(DateTime(timezone=True), default=get_utc_now, onupdate=get_utc_now, nullable=False)
 
 
+class TimeStampedModel(Base):
+    __abstract__ = True
+
+    id = Column(String(36), primary_key=True, default=lambda: str(uuid.uuid4()))
+    created_at = Column(DateTime(timezone=True), default=get_utc_now, nullable=False)
+    updated_at = Column(DateTime(timezone=True), default=get_utc_now, onupdate=get_utc_now, nullable=False)
+
+
 def get_db() -> Generator[Session, None, None]:
     db = SessionLocal()
     try:
