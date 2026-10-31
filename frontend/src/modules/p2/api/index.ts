@@ -12,7 +12,7 @@ import {
   ReconciliationReport
 } from '../types';
 
-const BASE_URL = import.meta.env?.VITE_API_BASE_URL || '/api/v1';
+const BASE_URL = (import.meta as any).env?.VITE_API_BASE_URL || '/api/v1';
 
 async function request<T>(endpoint: string, options: RequestInit = {}): Promise<T> {
   const url = `${BASE_URL}${endpoint}`;

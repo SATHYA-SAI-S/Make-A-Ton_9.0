@@ -89,13 +89,14 @@ export const StatCard: React.FC<{
   value: string | number;
   subtitle?: string;
   badge?: string;
-  variant?: 'neutral' | 'success' | 'warning' | 'danger';
+  variant?: 'neutral' | 'success' | 'warning' | 'danger' | 'info';
 }> = ({ title, value, subtitle, badge, variant = 'neutral' }) => {
   const borderColors: Record<string, string> = {
     neutral: '#E5E7EB',
     success: '#10B981',
     warning: '#F59E0B',
-    danger: '#EF4444'
+    danger: '#EF4444',
+    info: '#3B82F6'
   };
 
   return (

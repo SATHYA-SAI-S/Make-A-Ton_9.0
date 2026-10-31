@@ -24,7 +24,10 @@ OWN = {
         "backend/app/core/", "backend/app/shared/", "backend/app/main.py",
         "backend/app/__init__.py", "backend/tests/__init__.py", "backend/tests/conftest.py",
         "backend/app/celery_app.py", "backend/requirements/", "docker-compose.yml",
-        ".env.example", ".gitignore", "random.txt", "docs/contracts/"
+        ".env.example", ".gitignore", "random.txt", "docs/contracts/",
+        "frontend/package.json", "frontend/vite.config.ts", "frontend/index.html",
+        "frontend/tsconfig.json", "frontend/src/main.tsx", "frontend/src/app/",
+        "frontend/package-lock.json", "frontend/tsconfig.node.json"
     ],
     "p3": [
         "backend/app/portal/", "backend/app/finance/", "backend/app/analytics/",
