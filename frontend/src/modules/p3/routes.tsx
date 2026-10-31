@@ -16,6 +16,8 @@ import { CohortRetentionPage } from './pages/finance/CohortRetentionPage';
 import { RevenueConcentrationPage } from './pages/finance/RevenueConcentrationPage';
 import { ForecastSimulatorPage } from './pages/finance/ForecastSimulatorPage';
 import { RevenueGuardianDashboard } from './pages/guardian/RevenueGuardianDashboard';
+import { FinancialReportsPage } from './pages/reports/FinancialReportsPage';
+import { AuditViewer } from './pages/audit/AuditViewer';
 
 export const routes: RouteObject[] = [
   {
@@ -89,5 +91,13 @@ export const routes: RouteObject[] = [
   {
     path: '/p3/guardian',
     element: <RevenueGuardianDashboard />,
+  },
+  {
+    path: '/p3/reports',
+    element: <FinancialReportsPage />,
+  },
+  {
+    path: '/p3/audit',
+    element: <AuditViewer />,
   },
 ];
