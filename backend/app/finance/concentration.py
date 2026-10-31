@@ -3,16 +3,17 @@ Revenue Concentration & Pareto Analysis Service (P3-T11).
 Computes top customer dependency, cumulative shares, and plan-wise contributions.
 Deterministic tie-breaking and 100% share conservation.
 """
+from collections import defaultdict
 from datetime import date, timedelta
 from decimal import Decimal
 from typing import Any, Dict, List, Optional
-from sqlalchemy import and_, func, select
+from sqlalchemy import and_, func, select, or_
 from sqlalchemy.orm import Session
 
 from backend.app.analytics.cache import cached
 from backend.app.core.money import to_money
 from backend.app.finance.models import Customer, Invoice, Plan, Subscription, SubscriptionLine
-from backend.app.finance.overview import compute_mrr_sql
+from backend.app.finance.overview import compute_mrr_sql, normalize_mrr
 
 
 @cached("revenue_concentration_analysis", ttl=300)
@@ -40,7 +41,45 @@ def get_detailed_revenue_concentration(
     )
     total_annual_invoiced = to_money(db.execute(total_invoiced_stmt).scalar_one_or_none() or Decimal("0.00"))
 
-    # 3. Query all customers with their annual invoiced totals
+    # 3. Query all active subscriptions in a single aggregated batch (O(1) database hit)
+    active_subs_stmt = (
+        select(
+            Subscription.customer_id,
+            Subscription.plan_id,
+            Plan.name.label("plan_name"),
+            Plan.billing_frequency,
+            Plan.price.label("plan_price"),
+            func.coalesce(func.sum(SubscriptionLine.quantity * SubscriptionLine.unit_price), 0).label("lines_sum")
+        )
+        .select_from(Subscription)
+        .join(Plan, Subscription.plan_id == Plan.id)
+        .outerjoin(SubscriptionLine, Subscription.id == SubscriptionLine.subscription_id)
+        .where(
+            and_(
+                Subscription.status == "ACTIVE",
+                Subscription.start_date <= today,
+                or_(Subscription.expiry_date.is_(None), Subscription.expiry_date >= today)
+            )
+        )
+        .group_by(Subscription.id, Subscription.customer_id, Subscription.plan_id, Plan.name, Plan.billing_frequency, Plan.price)
+    )
+    all_subs_rows = db.execute(active_subs_stmt).fetchall()
+
+    customer_mrr_map: Dict[str, Decimal] = defaultdict(lambda: Decimal("0.00"))
+    customer_plans_map: Dict[str, List[Dict[str, str]]] = defaultdict(list)
+
+    for cid, pid, pname, freq, pprice, lsum in all_subs_rows:
+        base_price = to_money(lsum) if lsum and lsum > 0 else to_money(pprice)
+        sub_mrr = normalize_mrr(base_price, freq)
+        customer_mrr_map[cid] += sub_mrr
+        customer_plans_map[cid].append({
+            "plan_id": pid,
+            "plan_name": pname or pid,
+            "frequency": freq,
+            "mrr": str(sub_mrr),
+        })
+
+    # 4. Query all customers with their annual invoiced totals
     annual_inv_stmt = (
         select(
             Customer.id,
@@ -64,27 +103,11 @@ def get_detailed_revenue_concentration(
     customer_metrics = []
     for cid, cname, cemail, inv_sum in all_customer_rows:
         inv_amt = to_money(inv_sum)
-        c_mrr = compute_mrr_sql(db, as_of=today, customer_id=cid)
+        c_mrr = customer_mrr_map.get(cid, Decimal("0.00"))
 
         # Skip accounts with 0 MRR and 0 revenue
         if inv_amt == Decimal("0.00") and c_mrr == Decimal("0.00"):
             continue
-
-        # Get plan-wise breakdown for this customer
-        active_subs = (
-            db.query(Subscription)
-            .filter(Subscription.customer_id == cid, Subscription.status == "ACTIVE")
-            .all()
-        )
-        plan_breakdown = []
-        for s in active_subs:
-            sub_mrr = compute_mrr_sql(db, as_of=today, customer_id=cid, plan_id=s.plan_id)
-            plan_breakdown.append({
-                "plan_id": s.plan_id,
-                "plan_name": s.plan.name if s.plan else s.plan_id,
-                "frequency": s.plan.billing_frequency if s.plan else "MONTHLY",
-                "mrr": str(sub_mrr),
-            })
 
         customer_metrics.append({
             "customer_id": cid,
@@ -92,7 +115,7 @@ def get_detailed_revenue_concentration(
             "email": cemail,
             "annual_invoiced": inv_amt,
             "current_mrr": c_mrr,
-            "plan_breakdown": plan_breakdown,
+            "plan_breakdown": customer_plans_map.get(cid, []),
         })
 
     # Deterministic sorting with tie-breaking on customer_id
