@@ -25,6 +25,7 @@ from backend.app.analytics.metrics import (
     calculate_pct_change,
     normalize_mrr,
 )
+from backend.app.analytics.cache import cached
 from backend.app.core.money import to_money
 from backend.app.finance.models import (
     Customer,
@@ -379,6 +380,7 @@ def compute_subscription_movements_sql(
     return new_count, renewals_count, closed_count
 
 
+@cached("finance_overview", ttl=300)
 def get_finance_overview_data(
     db: Session,
     start_date: Optional[date] = None,
