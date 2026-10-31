@@ -18,6 +18,13 @@ from datetime import date, datetime, timedelta, timezone
 from decimal import Decimal
 from typing import List, Dict, Any, Optional
 
+import sys
+from pathlib import Path
+
+_backend_dir = Path(__file__).resolve().parent.parent.parent
+if str(_backend_dir) not in sys.path:
+    sys.path.insert(0, str(_backend_dir))
+
 from sqlalchemy.orm import Session
 from app.core.database import SessionLocal, engine, Base
 from app.finance.models import (
