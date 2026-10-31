@@ -5,10 +5,11 @@ export interface NavItem {
 }
 
 export const nav: NavItem[] = [
+  { label: 'Portal Dashboard', path: '/portal', module: 'p3' },
+  { label: 'My Subscriptions', path: '/portal/subscriptions', module: 'p3' },
+  { label: 'My Invoices', path: '/portal/invoices', module: 'p3' },
+  { label: 'Payment Ledger', path: '/portal/payments', module: 'p3' },
+  { label: 'Account Profile', path: '/portal/profile', module: 'p3' },
+  { label: 'Activity Timeline', path: '/portal/timeline', module: 'p3' },
   { label: 'UI Demo', path: '/ui-demo', module: 'p3' },
-  { label: 'Finance Overview', path: '/finance', module: 'p3' },
-  { label: 'Revenue Guardian', path: '/guardian', module: 'p3' },
-  { label: 'Customer Portal', path: '/portal', module: 'p3' },
-  { label: 'Reports', path: '/reports', module: 'p3' },
-  { label: 'Audit Trail', path: '/audit', module: 'p3' },
 ];
