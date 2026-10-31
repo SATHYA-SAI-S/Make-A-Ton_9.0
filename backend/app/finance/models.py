@@ -16,7 +16,8 @@ from sqlalchemy import (
     Boolean,
     ForeignKey,
     Text,
-    Index
+    Index,
+    JSON
 )
 from sqlalchemy.orm import relationship
 from backend.app.core.database import Base
@@ -187,3 +188,19 @@ class Refund(Base):
     created_at = Column(DateTime, default=lambda: datetime.now(timezone.utc), nullable=False)
 
     payment = relationship("Payment", back_populates="refunds")
+
+
+class ForecastScenario(Base):
+    __tablename__ = "forecast_scenarios"
+    __table_args__ = {"extend_existing": True}
+
+    id = Column(String(36), primary_key=True, default=lambda: str(uuid.uuid4()))
+    name = Column(String(255), nullable=False)
+    description = Column(Text, nullable=True)
+    horizon_months = Column(Integer, nullable=False, default=12)
+    assumptions = Column(JSON, nullable=False)
+    projection = Column(JSON, nullable=False)
+    summary = Column(JSON, nullable=True)
+    created_by = Column(String(100), nullable=True)
+    created_at = Column(DateTime, default=lambda: datetime.now(timezone.utc), nullable=False)
+

@@ -14,6 +14,7 @@ import { CollectionAnalytics } from './pages/finance/CollectionAnalytics';
 import { DrilldownInvoices } from './pages/finance/DrilldownInvoices';
 import { CohortRetentionPage } from './pages/finance/CohortRetentionPage';
 import { RevenueConcentrationPage } from './pages/finance/RevenueConcentrationPage';
+import { ForecastSimulatorPage } from './pages/finance/ForecastSimulatorPage';
 
 export const routes: RouteObject[] = [
   {
@@ -79,5 +80,9 @@ export const routes: RouteObject[] = [
   {
     path: '/p3/finance/concentration',
     element: <RevenueConcentrationPage />,
+  },
+  {
+    path: '/p3/finance/forecast',
+    element: <ForecastSimulatorPage />,
   },
 ];

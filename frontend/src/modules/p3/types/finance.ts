@@ -184,3 +184,56 @@ export interface ForecastBaselineData {
   horizon_months: number;
   baseline: ForecastPoint[];
 }
+
+export interface ForecastAssumptions {
+  new_growth_pct: number;
+  churn_pct: number;
+  expansion_pct: number;
+  contraction_pct: number;
+  collection_rate_pct: number;
+  price_increase_pct: number;
+  discount_pct: number;
+}
+
+export interface ForecastProjectionPoint {
+  month: string;
+  mrr: string;
+  arr: string;
+  projected_invoiced: string;
+  projected_collected: string;
+  projected_outstanding: string;
+  step_explanation: string;
+}
+
+export interface ForecastSummary {
+  starting_mrr: string;
+  ending_mrr: string;
+  horizon_months: number;
+  projected_growth_pct: number;
+  projected_annual_growth_pct: number;
+  total_projected_invoiced: string;
+  total_projected_collected: string;
+  total_projected_outstanding: string;
+}
+
+export interface ForecastSimulationResult {
+  starting_mrr: string;
+  horizon_months: number;
+  baseline_assumptions: ForecastAssumptions;
+  simulated_assumptions: ForecastAssumptions;
+  baseline: ForecastProjectionPoint[];
+  projection: ForecastProjectionPoint[];
+  summary: ForecastSummary;
+}
+
+export interface SavedForecastScenario {
+  id: string;
+  name: string;
+  description?: string;
+  horizon_months: number;
+  assumptions: ForecastAssumptions;
+  projection?: ForecastProjectionPoint[];
+  summary?: ForecastSummary;
+  created_by?: string;
+  created_at: string;
+}

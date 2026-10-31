@@ -10,6 +10,9 @@ import {
   RevenueConcentrationData,
   CohortsData,
   ForecastBaselineData,
+  ForecastAssumptions,
+  ForecastSimulationResult,
+  SavedForecastScenario,
 } from '../types/finance';
 
 const BASE_URL = '/api/v1/finance';
@@ -151,6 +154,78 @@ export const financeApi = {
       headers: getAuthHeaders(),
     });
     if (!res.ok) throw new Error(`Failed to fetch forecast baseline: ${res.statusText}`);
+    return res.json();
+  },
+
+  async simulateForecast(body: {
+    horizon_months?: number;
+    assumptions?: Partial<ForecastAssumptions>;
+    starting_mrr?: number;
+  }): Promise<ForecastSimulationResult> {
+    const res = await fetch(`${BASE_URL}/forecast/simulate`, {
+      method: 'POST',
+      headers: {
+        ...getAuthHeaders(),
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        horizon_months: body.horizon_months ?? 12,
+        assumptions: body.assumptions ?? {},
+        starting_mrr: body.starting_mrr,
+      }),
+    });
+    if (!res.ok) throw new Error(`Failed to simulate forecast: ${res.statusText}`);
+    return res.json();
+  },
+
+  async getForecastBaselineDetailed(horizon_months = 12): Promise<ForecastSimulationResult> {
+    const res = await fetch(`${BASE_URL}/forecast/baseline?horizon_months=${horizon_months}`, {
+      headers: getAuthHeaders(),
+    });
+    if (!res.ok) throw new Error(`Failed to fetch forecast baseline: ${res.statusText}`);
+    return res.json();
+  },
+
+  async saveForecastScenario(scenario: {
+    name: string;
+    description?: string;
+    horizon_months: number;
+    assumptions?: Partial<ForecastAssumptions>;
+  }): Promise<SavedForecastScenario> {
+    const res = await fetch(`${BASE_URL}/forecast/scenarios`, {
+      method: 'POST',
+      headers: {
+        ...getAuthHeaders(),
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(scenario),
+    });
+    if (!res.ok) throw new Error(`Failed to save scenario: ${res.statusText}`);
+    return res.json();
+  },
+
+  async listForecastScenarios(): Promise<SavedForecastScenario[]> {
+    const res = await fetch(`${BASE_URL}/forecast/scenarios`, {
+      headers: getAuthHeaders(),
+    });
+    if (!res.ok) throw new Error(`Failed to list scenarios: ${res.statusText}`);
+    return res.json();
+  },
+
+  async getForecastScenario(id: string): Promise<SavedForecastScenario> {
+    const res = await fetch(`${BASE_URL}/forecast/scenarios/${id}`, {
+      headers: getAuthHeaders(),
+    });
+    if (!res.ok) throw new Error(`Failed to get scenario: ${res.statusText}`);
+    return res.json();
+  },
+
+  async deleteForecastScenario(id: string): Promise<{ message: string; id: string }> {
+    const res = await fetch(`${BASE_URL}/forecast/scenarios/${id}`, {
+      method: 'DELETE',
+      headers: getAuthHeaders(),
+    });
+    if (!res.ok) throw new Error(`Failed to delete scenario: ${res.statusText}`);
     return res.json();
   },
 

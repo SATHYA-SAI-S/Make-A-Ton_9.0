@@ -11,6 +11,7 @@ from sqlalchemy.orm import sessionmaker
 from sqlalchemy.pool import StaticPool
 
 from backend.app.core.database import Base, get_db
+from backend.app.analytics.cache import invalidate_cache
 from backend.app.finance.cohorts import get_cohort_cell_customers, get_cohort_retention_matrix
 from backend.app.finance.concentration import get_detailed_revenue_concentration
 from backend.app.finance.models import Customer, Invoice, Plan, Subscription
@@ -19,6 +20,7 @@ from backend.app.main import app
 
 @pytest.fixture
 def cohort_seeded_db():
+    invalidate_cache()
     engine = create_engine(
         "sqlite:///:memory:",
         connect_args={"check_same_thread": False},
@@ -84,6 +86,7 @@ def cohort_seeded_db():
 
 @pytest.fixture
 def concentration_seeded_db():
+    invalidate_cache()
     engine = create_engine(
         "sqlite:///:memory:",
         connect_args={"check_same_thread": False},
