@@ -6,10 +6,10 @@
 - [x] Automated tests: test_foundation.py
 
 ## Phase 2: Notification Service (P2-T01)
-- [ ] NotificationPort implementation with bootstrap registration
-- [ ] Jinja2 transactional templates (password_reset, invoice_generated, invoice_confirmed, due_reminder, overdue_reminders, payment_received, payment_failed, renewal_confirmed)
-- [ ] Notifications data model and query endpoint GET /api/v1/notifications
-- [ ] Automated tests: test_notifications.py
+- [x] NotificationPort implementation with bootstrap registration
+- [x] Jinja2 transactional templates (password_reset, invoice_generated, invoice_confirmed, due_reminder, overdue_reminders, payment_received, payment_failed, renewal_confirmed)
+- [x] Notifications data model and query endpoint GET /api/v1/notifications
+- [x] Automated tests: test_notifications.py
 
 ## Phase 3: Tax Rules & Place-of-Supply Engine (P2-T02)
 - [ ] Tax rules models (tax_rules, tax_rule_products) and calculation history
