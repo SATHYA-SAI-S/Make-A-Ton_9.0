@@ -1,0 +1,8 @@
+# Person 3 dependencies (Finance, Analytics, Reporting, Guardian)
+-r base.txt
+pandas>=2.2.1
+numpy>=1.26.4
+reportlab>=4.1.0
+plotly>=5.20.0
+redis>=5.0.3
+celery>=5.3.6
