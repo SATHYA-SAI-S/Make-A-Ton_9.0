@@ -126,6 +126,7 @@ app.add_middleware(
 
 
 @app.get(f"{settings.API_V1_PREFIX}/health", tags=["Health"])
+@app.get("/health", tags=["Health"], include_in_schema=False)
 def health_check():
     return {
         "status": "ok",
@@ -134,6 +135,12 @@ def health_check():
         "version": settings.VERSION,
         "environment": settings.ENVIRONMENT
     }
+
+@app.get("/", include_in_schema=False)
+@app.get("/docs", include_in_schema=False)
+def root_redirect():
+    from fastapi.responses import RedirectResponse
+    return RedirectResponse(url=f"{settings.API_V1_PREFIX}/docs")
 
 
 # Register Person 1 routers under API_V1_PREFIX
