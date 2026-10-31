@@ -12,10 +12,10 @@
 - [x] Automated tests: test_notifications.py
 
 ## Phase 3: Tax Rules & Place-of-Supply Engine (P2-T02)
-- [ ] Tax rules models (tax_rules, tax_rule_products) and calculation history
-- [ ] Place-of-supply logic (Intra-state CGST + SGST vs Inter-state IGST)
-- [ ] Pure function compute_tax and TaxPreviewPort.preview registration
-- [ ] Automated tests: test_taxes.py
+- [x] Tax rules models (tax_rules, tax_rule_products) and calculation history
+- [x] Place-of-supply logic (Intra-state CGST + SGST vs Inter-state IGST)
+- [x] Pure function compute_tax and TaxPreviewPort.preview registration
+- [x] Automated tests: test_taxes.py
 
 ## Phase 4: Discount Rules & Eligibility (P2-T03)
 - [ ] Discount rules and redemptions models
