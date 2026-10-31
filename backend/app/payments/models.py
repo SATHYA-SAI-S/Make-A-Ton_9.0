@@ -26,7 +26,8 @@ class Payment(Base):
     created_at = Column(DateTime(timezone=True), default=get_utc_now, nullable=False)
     updated_at = Column(DateTime(timezone=True), default=get_utc_now, onupdate=get_utc_now, nullable=False)
 
-    allocations = relationship("PaymentAllocation", back_populates="payment", cascade="all, delete-orphan")
+    allocations = relationship("PaymentAllocation", back_populates="payment", cascade="all, delete-orphan", lazy="joined")
+    refunds = relationship("PaymentRefund", back_populates="payment", cascade="all, delete-orphan", lazy="joined")
 
 class PaymentAllocation(Base):
     __tablename__ = "payment_allocations"
@@ -38,3 +39,14 @@ class PaymentAllocation(Base):
     created_at = Column(DateTime(timezone=True), default=get_utc_now, nullable=False)
 
     payment = relationship("Payment", back_populates="allocations")
+
+class PaymentRefund(Base):
+    __tablename__ = "payment_refunds"
+
+    id = Column(String(36), primary_key=True, default=lambda: str(uuid.uuid4()))
+    payment_id = Column(String(36), ForeignKey("payments.id", ondelete="CASCADE"), nullable=False, index=True)
+    amount = Column(Numeric(14, 2), nullable=False)
+    reason = Column(String(255), nullable=True)
+    created_at = Column(DateTime(timezone=True), default=get_utc_now, nullable=False)
+
+    payment = relationship("Payment", back_populates="refunds")

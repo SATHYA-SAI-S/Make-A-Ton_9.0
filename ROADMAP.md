@@ -49,12 +49,12 @@
 - [x] Automated tests: test_billing_engine.py
 
 ## Phase 9: Payments, Split Allocation & Refunds (P2-T10, P2-T11)
-- [ ] Payment recording across methods (UPI, Card, Bank Transfer, Cash, Other)
-- [ ] Split allocation engine (1-to-many, many-to-1) with balance controls
-- [ ] Refunds and failed payment logging
-- [ ] Payment gateway test-mode order and webhook handler with signature checks
-- [ ] PaymentPort registration
-- [ ] Automated tests: test_payments.py
+- [x] Payment recording across methods (UPI, Card, Bank Transfer, Cash, Other)
+- [x] Split allocation engine (1-to-many, many-to-1) with balance controls
+- [x] Refunds and failed payment logging
+- [x] Payment gateway test-mode order and webhook handler with signature checks
+- [x] PaymentPort registration
+- [x] Automated tests: test_payments.py
 
 ## Phase 10: Overdue Management, Reminders & Reconciliation (P2-T12, P2-T13)
 - [ ] Overdue detection and escalation tiers (1, 2, 3)
