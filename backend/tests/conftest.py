@@ -11,6 +11,7 @@ import backend.app.discounts.models
 import backend.app.billing.models
 import backend.app.invoices.models
 import backend.app.payments.models
+import backend.app.overdue.models
 
 @pytest.fixture(scope="session", autouse=True)
 def setup_test_environment():

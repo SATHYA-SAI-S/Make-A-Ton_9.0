@@ -57,10 +57,10 @@
 - [x] Automated tests: test_payments.py
 
 ## Phase 10: Overdue Management, Reminders & Reconciliation (P2-T12, P2-T13)
-- [ ] Overdue detection and escalation tiers (1, 2, 3)
-- [ ] Follow-up history and collection summary endpoints
-- [ ] Comprehensive reconciliation service comparing payments, allocations, and invoices
-- [ ] Automated tests: test_overdue_reconciliation.py
+- [x] Overdue detection and escalation tiers (1, 2, 3)
+- [x] Follow-up history and collection summary endpoints
+- [x] Comprehensive reconciliation service comparing payments, allocations, and invoices
+- [x] Automated tests: test_overdue_reconciliation.py
 
 ## Phase 11: Frontend Module (P2-T14)
 - [ ] React + TypeScript views: Taxes, Discounts, Billing Control, Invoices, Payments, Overdue, Reconciliation
