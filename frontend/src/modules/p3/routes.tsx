@@ -15,6 +15,7 @@ import { DrilldownInvoices } from './pages/finance/DrilldownInvoices';
 import { CohortRetentionPage } from './pages/finance/CohortRetentionPage';
 import { RevenueConcentrationPage } from './pages/finance/RevenueConcentrationPage';
 import { ForecastSimulatorPage } from './pages/finance/ForecastSimulatorPage';
+import { RevenueGuardianDashboard } from './pages/guardian/RevenueGuardianDashboard';
 
 export const routes: RouteObject[] = [
   {
@@ -84,5 +85,9 @@ export const routes: RouteObject[] = [
   {
     path: '/p3/finance/forecast',
     element: <ForecastSimulatorPage />,
+  },
+  {
+    path: '/p3/guardian',
+    element: <RevenueGuardianDashboard />,
   },
 ];

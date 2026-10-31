@@ -17,5 +17,6 @@ export const nav: NavItem[] = [
   { label: 'Cohort Retention', path: '/p3/finance/cohorts', module: 'p3' },
   { label: 'Revenue Concentration', path: '/p3/finance/concentration', module: 'p3' },
   { label: 'Forecast Simulator', path: '/p3/finance/forecast', module: 'p3' },
+  { label: 'Revenue Guardian', path: '/p3/guardian', module: 'p3' },
   { label: 'UI Demo', path: '/ui-demo', module: 'p3' },
 ];
