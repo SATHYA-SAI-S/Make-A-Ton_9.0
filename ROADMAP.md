@@ -30,10 +30,10 @@
 - [x] Automated tests: test_calculator.py
 
 ## Phase 6: Billing & Invoice Database Models & Migration (P2-T05)
-- [ ] Billing models: billing_runs, billing_run_items, billing_periods, invoices, invoice_lines, payments, payment_allocations, billing_settings
-- [ ] Unique constraints and optimized indexing for analytics
-- [ ] Alembic migration p2_0001
-- [ ] Automated tests: test_models_migrations.py
+- [x] Billing models: billing_runs, billing_run_items, billing_periods, invoices, invoice_lines, payments, payment_allocations, billing_settings
+- [x] Unique constraints and optimized indexing for analytics
+- [x] Alembic migration p2_0001
+- [x] Automated tests: test_models_migrations.py
 
 ## Phase 7: Invoice Lifecycle, Snapshots & PDF Generation (P2-T06, P2-T09)
 - [ ] State machine transitions (DRAFT -> CONFIRMED -> PARTIALLY_PAID -> PAID, CANCELLED)
