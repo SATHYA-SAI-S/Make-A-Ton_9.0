@@ -1,0 +1,4 @@
+-r base.txt
+reportlab>=4.1.0
+razorpay>=1.4.1
+stripe>=8.0.0

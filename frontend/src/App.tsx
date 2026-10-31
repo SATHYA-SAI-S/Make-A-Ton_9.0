@@ -12,6 +12,8 @@ import { SubscriptionsPage } from "./modules/subscriptions/SubscriptionsPage";
 import { StaffPage } from "./modules/staff/StaffPage";
 import { CustomerPortalPage } from "./modules/portal/CustomerPortalPage";
 
+import { BillingModule } from "./modules/p2";
+
 const getDefaultTabForRole = (role?: string) => {
   if (role === "admin") return "dashboard";
   if (role === "staff") return "staff-dashboard";
@@ -43,6 +45,7 @@ const DashboardLayout: React.FC = () => {
             {currentTab === "plans" && <PlansPage />}
             {currentTab === "quotations" && <QuotationsPage />}
             {currentTab === "subscriptions" && <SubscriptionsPage />}
+            {currentTab === "billing" && <BillingModule />}
             {/* If tab not allowed for staff, fallback to staff-dashboard */}
             {["dashboard", "staff", "portal"].includes(currentTab) && (
               <StaffDashboard onNavigate={setCurrentTab} />
@@ -59,6 +62,7 @@ const DashboardLayout: React.FC = () => {
             {currentTab === "plans" && <PlansPage />}
             {currentTab === "quotations" && <QuotationsPage />}
             {currentTab === "subscriptions" && <SubscriptionsPage />}
+            {currentTab === "billing" && <BillingModule />}
             {currentTab === "staff" && <StaffPage />}
             {/* If admin navigates to non-admin tab */}
             {["staff-dashboard", "portal"].includes(currentTab) && (
@@ -70,6 +74,7 @@ const DashboardLayout: React.FC = () => {
     </div>
   );
 };
+
 
 const MainApp: React.FC = () => {
   const { user, isLoading } = useAuth();

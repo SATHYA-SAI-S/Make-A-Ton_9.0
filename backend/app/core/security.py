@@ -2,13 +2,18 @@ import re
 import hashlib
 import secrets
 from datetime import datetime, timedelta, timezone
-from typing import Any, Dict, Optional, Tuple
+from typing import Any, Dict, List, Optional, Tuple
 
 import jwt
 from argon2 import PasswordHasher
 from argon2.exceptions import VerifyMismatchError, VerificationError, InvalidHashError
+from fastapi import Depends, Header, HTTPException, status
+from pydantic import BaseModel
 
-from app.core.config import settings
+try:
+    from app.core.config import settings
+except ImportError:
+    from app.core.config import settings
 
 _ph = PasswordHasher()
 
@@ -52,7 +57,7 @@ def create_access_token(subject: str, role: str, expires_delta: Optional[timedel
         expire = now + expires_delta
     else:
         expire = now + timedelta(minutes=settings.ACCESS_TOKEN_EXPIRE_MINUTES)
-    
+
     payload: Dict[str, Any] = {
         "sub": subject,
         "role": role,
@@ -112,4 +117,46 @@ def verify_otp_hash(plain_otp: str, hashed_otp: str) -> bool:
     """Constant-time verification of plain OTP against its stored SHA-256 hash."""
     computed = hash_otp(plain_otp)
     return secrets.compare_digest(computed, hashed_otp)
+
+
+class UserContext(BaseModel):
+    user_id: str = "dev-user-admin"
+    email: str = "admin@brightloop.com"
+    role: str = "admin"  # admin, staff, customer
+    customer_id: Optional[str] = "cust-dev-001"
+
+
+def current_user(
+    authorization: Optional[str] = Header(None),
+    x_user_role: Optional[str] = Header("admin"),
+    x_user_id: Optional[str] = Header("dev-user-admin"),
+    x_customer_id: Optional[str] = Header(None)
+) -> UserContext:
+    """Dev user context resolver allowing easy testing across roles."""
+    return UserContext(
+        user_id=x_user_id or "dev-user-admin",
+        email=f"{x_user_role}@brightloop.com",
+        role=x_user_role or "admin",
+        customer_id=x_customer_id or ("cust-dev-001" if x_user_role == "customer" else None)
+    )
+
+
+def require_roles(*allowed_roles: str):
+    def role_checker(user: UserContext = Depends(current_user)):
+        if user.role not in allowed_roles and user.role != "admin":
+            raise HTTPException(
+                status_code=status.HTTP_403_FORBIDDEN,
+                detail=f"Role '{user.role}' is not authorized to access this resource"
+            )
+        return user
+    return role_checker
+
+
+def require_customer_owner(customer_id: str, user: UserContext = Depends(current_user)):
+    if user.role == "customer" and user.customer_id != customer_id:
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="Cannot access another customer's resources"
+        )
+    return user
 

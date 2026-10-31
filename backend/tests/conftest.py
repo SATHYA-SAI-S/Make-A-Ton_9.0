@@ -2,48 +2,79 @@ import sys
 import os
 import pytest
 from fastapi.testclient import TestClient
-from sqlalchemy import create_engine
-from sqlalchemy.orm import sessionmaker
-from sqlalchemy.pool import StaticPool
 
-# Add backend to sys.path
-sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
+# Ensure both repo root and backend directory are in sys.path
+repo_root = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", ".."))
+backend_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), ".."))
+if repo_root not in sys.path:
+    sys.path.insert(0, repo_root)
+if backend_dir not in sys.path:
+    sys.path.insert(0, backend_dir)
 
-from app.core.database import Base, get_db
+os.environ["TESTING"] = "1"
+os.environ["ENVIRONMENT"] = "testing"
+
+# Import all models to ensure Base.metadata is completely populated across P1 & P2
+import app.auth.models
+import app.customers.models
+import app.catalogue.models
+import app.quotations.models
+import app.subscriptions.models
+
+import app.notifications.models
+import app.taxes.models
+import app.discounts.models
+import app.billing.models
+import app.invoices.models
+import app.payments.models
+import app.overdue.models
+from app.taxes.models import BillingSettings
+from app.shared.registry import get_port
+
+from app.core.database import Base, engine, SessionLocal, get_db
 from app.core.security import hash_password, create_access_token
 from app.auth.models import User
 from app.customers.models import Customer
 from app.main import app
 
-# In-memory SQLite database for fast, isolated test runs
-SQLALCHEMY_DATABASE_URL = "sqlite:///:memory:"
-
-engine = create_engine(
-    SQLALCHEMY_DATABASE_URL,
-    connect_args={"check_same_thread": False},
-    poolclass=StaticPool,
-)
-TestingSessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
-
 
 @pytest.fixture(scope="session", autouse=True)
-def setup_database():
+def setup_test_environment():
+    os.environ["TESTING"] = "1"
+    os.environ["ENVIRONMENT"] = "testing"
+
+
+@pytest.fixture(autouse=True)
+def auto_db_setup():
+    Base.metadata.drop_all(bind=engine)
     Base.metadata.create_all(bind=engine)
+    db = SessionLocal()
+    if BillingSettings is not None:
+        if not db.query(BillingSettings).filter_by(id="default").first():
+            db.add(BillingSettings(id="default", company_state_code="KA", company_name="Brightloop Software"))
+            db.commit()
+    db.close()
+
+    if get_port is not None:
+        try:
+            sub_port = get_port("subscription")
+            if hasattr(sub_port, "subscriptions"):
+                sub_port.subscriptions.clear()
+        except Exception:
+            pass
+
     yield
+
     Base.metadata.drop_all(bind=engine)
 
 
 @pytest.fixture
 def db():
-    connection = engine.connect()
-    transaction = connection.begin()
-    session = TestingSessionLocal(bind=connection)
-
-    yield session
-
-    session.close()
-    transaction.rollback()
-    connection.close()
+    session = SessionLocal()
+    try:
+        yield session
+    finally:
+        session.close()
 
 
 @pytest.fixture
@@ -142,3 +173,4 @@ def customer_token(customer_user):
 @pytest.fixture
 def customer_headers(customer_token):
     return {"Authorization": f"Bearer {customer_token}"}
+

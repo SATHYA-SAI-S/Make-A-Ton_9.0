@@ -6,6 +6,7 @@ import {
   Calendar,
   FileText,
   Repeat,
+  Receipt,
   ShieldCheck,
   UserCheck,
   LogOut
@@ -28,6 +29,7 @@ export const Sidebar: React.FC<SidebarProps> = ({ currentTab, onSelectTab }) => 
     { id: "plans", label: "Subscription Plans", icon: Calendar },
     { id: "quotations", label: "Quotations", icon: FileText },
     { id: "subscriptions", label: "Subscriptions", icon: Repeat },
+    { id: "billing", label: "Billing & Invoices", icon: Receipt },
     { id: "staff", label: "Staff Management", icon: ShieldCheck },
   ];
 
@@ -38,7 +40,9 @@ export const Sidebar: React.FC<SidebarProps> = ({ currentTab, onSelectTab }) => 
     { id: "plans", label: "Subscription Plans", icon: Calendar },
     { id: "quotations", label: "Quotations", icon: FileText },
     { id: "subscriptions", label: "Subscriptions", icon: Repeat },
+    { id: "billing", label: "Billing & Invoices", icon: Receipt },
   ];
+
 
   const customerNavItems = [
     { id: "portal", label: "Customer Portal", icon: UserCheck },
