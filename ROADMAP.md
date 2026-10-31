@@ -36,10 +36,10 @@
 - [x] Automated tests: test_models_migrations.py
 
 ## Phase 7: Invoice Lifecycle, Snapshots & PDF Generation (P2-T06, P2-T09)
-- [ ] State machine transitions (DRAFT -> CONFIRMED -> PARTIALLY_PAID -> PAID, CANCELLED)
-- [ ] Immutable snapshot JSON storage
-- [ ] PDF rendering and InvoicePort (list_for_customer, get, pdf)
-- [ ] Automated tests: test_invoices.py
+- [x] State machine transitions (DRAFT -> CONFIRMED -> PARTIALLY_PAID -> PAID, CANCELLED)
+- [x] Immutable snapshot JSON storage
+- [x] PDF rendering and InvoicePort (list_for_customer, get, pdf)
+- [x] Automated tests: test_invoices.py
 
 ## Phase 8: Billing Engine with Idempotency & Locking (P2-T07, P2-T08)
 - [ ] Advisory locked billing engine in billing/engine.py
