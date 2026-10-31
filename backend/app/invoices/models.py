@@ -18,7 +18,7 @@ class Invoice(Base):
     number = Column(String(50), unique=True, nullable=False, index=True)
     customer_id = Column(String(36), nullable=False, index=True)
     subscription_id = Column(String(36), nullable=True, index=True)
-    billing_period_id = Column(String(36), unique=True, nullable=True)
+    billing_period_id = Column(String(36), index=True, nullable=True)
     status = Column(String(20), default="DRAFT", nullable=False)  # DRAFT, CONFIRMED, PARTIALLY_PAID, PAID, CANCELLED
     invoice_date = Column(Date, default=date.today, nullable=False)
     due_date = Column(Date, nullable=False, index=True)
@@ -28,11 +28,11 @@ class Invoice(Base):
     total = Column(Numeric(14, 2), nullable=False)
     amount_paid = Column(Numeric(14, 2), default=Decimal("0.00"), nullable=False)
     balance = Column(Numeric(14, 2), nullable=False)
-    currency = Column(String(10), default="INR", nullable=False)
+    currency = Column(String(10), default="INR", server_default="INR", nullable=True)
     cancellation_reason = Column(Text, nullable=True)
-    snapshot = Column(JSON, default=dict, nullable=False)
+    snapshot = Column(JSON, default=dict, server_default="{}", nullable=True)
     created_at = Column(DateTime(timezone=True), default=get_utc_now, nullable=False)
-    updated_at = Column(DateTime(timezone=True), default=get_utc_now, onupdate=get_utc_now, nullable=False)
+    updated_at = Column(DateTime(timezone=True), default=get_utc_now, onupdate=get_utc_now, nullable=True)
 
     lines = relationship("InvoiceLine", back_populates="invoice", cascade="all, delete-orphan")
 
@@ -55,7 +55,7 @@ class InvoiceLine(Base):
     invoice_id = Column(String(36), ForeignKey("invoices.id", ondelete="CASCADE"), nullable=False, index=True)
     product_id = Column(String(36), nullable=False)
     variant_id = Column(String(36), nullable=True)
-    description = Column(Text, nullable=False)
+    description = Column(Text, default="", server_default="", nullable=True)
     quantity = Column(Numeric(10, 0), default=1, nullable=False)
     unit_price = Column(Numeric(14, 2), nullable=False)
     discount_amount = Column(Numeric(14, 2), default=Decimal("0.00"), nullable=False)

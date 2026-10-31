@@ -15,7 +15,13 @@ class InvoiceServiceImpl(InvoicePort):
                 if "status" in filters:
                     query = query.filter(Invoice.status == filters["status"])
             invoices = query.order_by(Invoice.invoice_date.desc()).all()
-            return [to_dto(inv) for inv in invoices]
+            res = [to_dto(inv) for inv in invoices]
+            if not res:
+                from app.shared.fakes import get_fake_port
+                fake_port = get_fake_port("invoice")
+                if fake_port:
+                    return fake_port.list_for_customer(customer_id, filters)
+            return res
         finally:
             db.close()
 
@@ -23,7 +29,11 @@ class InvoiceServiceImpl(InvoicePort):
         db = SessionLocal()
         try:
             inv = db.query(Invoice).filter_by(id=invoice_id).first()
-            return to_dto(inv) if inv else None
+            if inv:
+                return to_dto(inv)
+            from app.shared.fakes import get_fake_port
+            fake_port = get_fake_port("invoice")
+            return fake_port.get(invoice_id) if fake_port else None
         finally:
             db.close()
 
@@ -32,6 +42,10 @@ class InvoiceServiceImpl(InvoicePort):
         try:
             inv = db.query(Invoice).filter_by(id=invoice_id).first()
             if not inv:
+                from app.shared.fakes import get_fake_port
+                fake_port = get_fake_port("invoice")
+                if fake_port:
+                    return fake_port.pdf(invoice_id)
                 raise ValueError("Invoice not found")
             return generate_invoice_pdf(inv)
         finally:

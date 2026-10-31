@@ -1,10 +1,12 @@
 from datetime import date, datetime
 from decimal import Decimal
 from typing import Any, Dict, List, Optional
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, ConfigDict, Field
 
 
 class DictLikeBaseModel(BaseModel):
+    model_config = ConfigDict(extra="allow")
+
     def __getitem__(self, item: str) -> Any:
         try:
             return getattr(self, item)
@@ -12,7 +14,9 @@ class DictLikeBaseModel(BaseModel):
             raise KeyError(item)
 
     def __setitem__(self, key: str, value: Any) -> None:
+        self.__dict__[key] = value
         setattr(self, key, value)
+
 
     def __contains__(self, item: str) -> bool:
         return hasattr(self, item)

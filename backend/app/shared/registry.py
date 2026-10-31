@@ -19,4 +19,9 @@ def get_port(name: str) -> Any:
 def clear_registry() -> None:
     """Clears registry (useful for unit test resets)."""
     _ports.clear()
+    try:
+        from app.shared.fakes import _fake_instances
+        _fake_instances.clear()
+    except Exception:
+        pass
 

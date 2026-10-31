@@ -7,7 +7,7 @@ from fastapi.responses import JSONResponse
 
 from app.core.config import settings
 from app.core.errors import register_error_handlers, SubscriptIQError
-from app.core.database import engine, Base
+from app.core.database import engine, Base, create_all_tables
 
 # Import Person 1 models
 try:
@@ -89,7 +89,7 @@ def discover_modules(app_instance: FastAPI):
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
-    Base.metadata.create_all(bind=engine)
+    create_all_tables(bind=engine)
     discover_modules(app)
     yield
 

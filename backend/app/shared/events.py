@@ -25,18 +25,19 @@ def subscribe(event_name: str, handler: Callable[[Any], None]) -> None:
     _subscribers[event_name].append(handler)
 
 
-def publish(event_or_name: Union[DomainEvent, str], payload: Optional[Dict[str, Any]] = None, actor_id: Optional[str] = None) -> DomainEvent:
+def publish(event_or_name: Union[DomainEvent, str, None] = None, payload: Optional[Dict[str, Any]] = None, actor_id: Optional[str] = None, event_name: Optional[str] = None, **kwargs) -> DomainEvent:
     """Publishes an event to subscribers supporting both DomainEvent instance and (event_name, payload) arguments."""
-    if isinstance(event_or_name, DomainEvent):
-        evt = event_or_name
-    elif isinstance(event_or_name, str):
+    target = event_name or event_or_name
+    if isinstance(target, DomainEvent):
+        evt = target
+    elif isinstance(target, str):
         evt = DomainEvent(
-            event_name=event_or_name,
+            event_name=target,
             payload=payload or {},
             actor_id=actor_id
         )
     else:
-        evt = event_or_name
+        evt = target
 
     handlers = _subscribers.get(evt.event_name, []) + _subscribers.get("*", [])
     for handler in handlers:

@@ -59,8 +59,17 @@ class SubscriptIQError(AppException):
 
 
 class NotFoundException(SubscriptIQError):
-    def __init__(self, message: str = "Resource not found", code: str = "NOT_FOUND", details: Optional[Dict[str, Any]] = None, **kwargs):
-        super().__init__(code=code, message=message, status_code=status.HTTP_404_NOT_FOUND, details=details)
+    def __init__(self, message: str = "Resource not found", arg2: Optional[str] = None, code: str = "RESOURCE_NOT_FOUND", details: Optional[Dict[str, Any]] = None, **kwargs):
+        if arg2 is not None:
+            resource_type = message
+            resource_id = arg2
+            msg = f"{resource_type} with identifier '{resource_id}' was not found."
+            dtls = details or {"resource": resource_type, "id": resource_id}
+            super().__init__(code=kwargs.get("code", code), message=msg, status_code=status.HTTP_404_NOT_FOUND, details=dtls)
+        else:
+            actual_code = kwargs.get("code", code)
+            super().__init__(code=actual_code, message=message, status_code=status.HTTP_404_NOT_FOUND, details=details)
+
 
 
 class UnauthorizedException(SubscriptIQError):

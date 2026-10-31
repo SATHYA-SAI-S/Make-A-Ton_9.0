@@ -1,6 +1,6 @@
 import uuid
 from datetime import datetime, timezone
-from typing import Generator
+from typing import Generator, Optional
 
 from sqlalchemy import create_engine, Column, DateTime, String, Uuid
 from sqlalchemy.orm import declarative_base, sessionmaker, Session, DeclarativeBase, Mapped, mapped_column
@@ -30,17 +30,22 @@ def get_utc_now():
     return datetime.now(timezone.utc)
 
 
+from sqlalchemy import func
+
+
 class TimestampMixin:
-    created_at: Mapped[datetime] = mapped_column(
+    created_at: Mapped[Optional[datetime]] = mapped_column(
         DateTime(timezone=True),
         default=lambda: datetime.now(timezone.utc),
-        nullable=False
+        server_default=func.now(),
+        nullable=True
     )
-    updated_at: Mapped[datetime] = mapped_column(
+    updated_at: Mapped[Optional[datetime]] = mapped_column(
         DateTime(timezone=True),
         default=lambda: datetime.now(timezone.utc),
         onupdate=lambda: datetime.now(timezone.utc),
-        nullable=False
+        server_default=func.now(),
+        nullable=True
     )
 
 
@@ -66,4 +71,33 @@ def get_db() -> Generator[Session, None, None]:
         yield db
     finally:
         db.close()
+
+
+_orig_create_all = Base.metadata.create_all
+_orig_drop_all = Base.metadata.drop_all
+
+def patched_create_all(*args, **kwargs):
+    bind = kwargs.get("bind") or (args[0] if len(args) > 0 else None)
+    _orig_create_all(*args, **kwargs)
+    try:
+        from app.finance.models import FinanceBase
+        FinanceBase.metadata.create_all(bind=bind, checkfirst=True)
+    except Exception as e:
+        pass
+
+def patched_drop_all(*args, **kwargs):
+    bind = kwargs.get("bind") or (args[0] if len(args) > 0 else None)
+    try:
+        from app.finance.models import FinanceBase
+        FinanceBase.metadata.drop_all(bind=bind, checkfirst=True)
+    except Exception:
+        pass
+    _orig_drop_all(*args, **kwargs)
+
+Base.metadata.create_all = patched_create_all
+Base.metadata.drop_all = patched_drop_all
+
+def create_all_tables(bind=None):
+    Base.metadata.create_all(bind=bind or engine)
+
 

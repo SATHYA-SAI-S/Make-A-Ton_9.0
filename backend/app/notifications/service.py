@@ -37,6 +37,10 @@ class NotificationService(NotificationPort):
         self.smtp_host = smtp_host or settings.SMTP_HOST
         self.smtp_port = smtp_port or settings.SMTP_PORT
         self.mock_send = mock_send
+        self.sent_messages: List[Dict[str, Any]] = []
+
+    def reset(self):
+        self.sent_messages.clear()
 
     def render(self, template_name: str, context: Dict[str, Any]) -> str:
         name = template_name.replace(".html", "")
@@ -54,6 +58,12 @@ class NotificationService(NotificationPort):
         customer_id: Optional[str] = None,
         db_session=None
     ) -> bool:
+        self.sent_messages.append({
+            "template": template,
+            "to": to,
+            "context": context,
+            "customer_id": customer_id
+        })
         subject = context.get("subject") or SUBJECT_MAP.get(template, f"SubscriptIQ Notification: {template}")
         body_html = self.render(template, context)
 

@@ -42,7 +42,7 @@ def round_money(val: Decimal) -> Decimal:
 def format_money(val: Union[Decimal, str, int, float, None], currency: str = "") -> str:
     """Formats Decimal as standard currency string e.g. '1250.00'."""
     d = to_decimal(val)
-    return f"{d:.2f}"
+    return f"{d:,.2f}"
 
 
 def format_currency(val: Union[Decimal, int, str, float, None], currency: str = "₹") -> str:

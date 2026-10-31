@@ -43,12 +43,14 @@ class Plan(Base, TimestampMixin):
     name: Mapped[str] = mapped_column(String(255), nullable=False, index=True)
     billing_frequency: Mapped[str] = mapped_column(String(50), nullable=False)  # daily, weekly, monthly, yearly
     min_quantity: Mapped[int] = mapped_column(Integer, default=1, nullable=False)
-    available_from: Mapped[date] = mapped_column(Date, nullable=False)
-    available_to: Mapped[date] = mapped_column(Date, nullable=False)
+    available_from: Mapped[Optional[date]] = mapped_column(Date, nullable=True)
+    available_to: Mapped[Optional[date]] = mapped_column(Date, nullable=True)
     allow_pause: Mapped[bool] = mapped_column(Boolean, default=True, nullable=False)
     allow_early_close: Mapped[bool] = mapped_column(Boolean, default=True, nullable=False)
     allow_renewal: Mapped[bool] = mapped_column(Boolean, default=True, nullable=False)
     status: Mapped[str] = mapped_column(String(50), default="active", nullable=False)  # active, closed
+    price: Mapped[Optional[Decimal]] = mapped_column(Numeric(14, 2), default=Decimal("0.00"), nullable=True)
+    current_version: Mapped[Optional[int]] = mapped_column(Integer, default=1, nullable=True)
 
     versions: Mapped[List["PlanVersion"]] = relationship("PlanVersion", back_populates="plan", cascade="all, delete-orphan", order_by="desc(PlanVersion.version_no)")
 

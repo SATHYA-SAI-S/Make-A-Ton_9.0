@@ -134,6 +134,10 @@ class FakeCustomerPort(CustomerPort):
                 return c
         return list(self.customers.values())[0] if self.customers else None
 
+    def reset(self):
+        self.__init__()
+
+
 
 class FakeSubscriptionPort(SubscriptionPort):
     def __init__(self):
@@ -249,8 +253,11 @@ class FakeSubscriptionPort(SubscriptionPort):
             self.subscriptions[subscription_id].status = "ACTIVE"
         elif action == "CLOSE":
             self.subscriptions[subscription_id].status = "CLOSED"
-            self.subscriptions[subscription_id].close_reason = reason or "EARLY_CLOSURE"
         return True
+
+    def reset(self):
+        self.__init__()
+
 
 
 class FakeInvoicePort(InvoicePort):
@@ -333,6 +340,10 @@ class FakeInvoicePort(InvoicePort):
         inv = self.get(invoice_id)
         content = f"%PDF-1.4\n1 0 obj<< /Title (Invoice {inv.number if inv else invoice_id}) >>\nendobj\ntrailer<<>>\n%%EOF"
         return content.encode("utf-8")
+
+    def reset(self):
+        self.__init__()
+
 
 
 class FakePaymentPort(PaymentPort):

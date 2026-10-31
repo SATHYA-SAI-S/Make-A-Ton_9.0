@@ -27,7 +27,7 @@ def get_portal_dashboard(customer: Dict[str, Any]) -> Dict[str, Any]:
     next_renewal = min(renewal_dates) if renewal_dates else None
 
     # Invoices & Balance
-    all_invoices = inv_port.list_for_customer(cust_id)
+    all_invoices = [to_dict_item(i) for i in inv_port.list_for_customer(cust_id)]
     unpaid_invoices = [
         i for i in all_invoices
         if i.get("status") in ["CONFIRMED", "PARTIALLY_PAID"] and i.get("balance", Decimal("0")) > Decimal("0")
@@ -35,7 +35,7 @@ def get_portal_dashboard(customer: Dict[str, Any]) -> Dict[str, Any]:
     outstanding_bal = pay_port.outstanding_for_customer(cust_id)
 
     return {
-        "customer": customer,
+        "customer": to_dict_item(customer),
         "active_subscriptions_count": len(active_subs),
         "outstanding_balance": outstanding_bal,
         "unpaid_invoices_count": len(unpaid_invoices),
@@ -43,6 +43,15 @@ def get_portal_dashboard(customer: Dict[str, Any]) -> Dict[str, Any]:
         "recent_subscriptions": all_subs[:5],
         "recent_invoices": all_invoices[:5],
     }
+
+def to_dict_item(obj: Any) -> Dict[str, Any]:
+    if isinstance(obj, dict):
+        return obj
+    if hasattr(obj, "model_dump"):
+        return obj.model_dump()
+    if hasattr(obj, "dict"):
+        return obj.dict()
+    return dict(obj)
 
 def list_customer_subscriptions(
     customer: Dict[str, Any],
@@ -63,12 +72,15 @@ def list_customer_subscriptions(
         matching = [s for s in matching if s.get("status") == status_filter]
 
     # Include timeline activity simulation
+    res = []
     for s in matching:
-        s["timeline"] = [
-            {"date": str(s.get("start_date")), "event": "Subscription Created & Confirmed"},
-            {"date": str(s.get("start_date")), "event": "Subscription Activated (ACTIVE)"},
+        item = to_dict_item(s).copy()
+        item["timeline"] = [
+            {"date": str(item.get("start_date")), "event": "Subscription Created & Confirmed"},
+            {"date": str(item.get("start_date")), "event": "Subscription Activated (ACTIVE)"},
         ]
-    return matching
+        res.append(item)
+    return res
 
 def get_customer_subscription_detail(
     customer: Dict[str, Any],
@@ -85,7 +97,12 @@ def get_customer_subscription_detail(
     if sub.get("customer_id") != customer["id"]:
         raise NotFoundError("Subscription", subscription_id)
 
-    return sub
+    res = to_dict_item(sub).copy()
+    res["timeline"] = [
+        {"date": str(res.get("start_date")), "event": "Subscription Created & Confirmed"},
+        {"date": str(res.get("start_date")), "event": "Subscription Activated (ACTIVE)"},
+    ]
+    return res
 
 def list_customer_invoices(
     customer: Dict[str, Any],
@@ -98,7 +115,7 @@ def list_customer_invoices(
     if status_filter and status_filter != "ALL":
         invoices = [i for i in invoices if i.get("status") == status_filter]
 
-    return invoices
+    return [to_dict_item(i) for i in invoices]
 
 def get_customer_invoice_detail(
     customer: Dict[str, Any],
@@ -115,7 +132,7 @@ def get_customer_invoice_detail(
     if invoice.get("customer_id") != customer["id"]:
         raise NotFoundError("Invoice", invoice_id)
 
-    return invoice
+    return to_dict_item(invoice)
 
 def get_customer_invoice_pdf(
     customer: Dict[str, Any],

@@ -21,10 +21,14 @@ class Customer(Base, TimestampMixin):
     city: Mapped[Optional[str]] = mapped_column(String(100), nullable=True)
     state: Mapped[Optional[str]] = mapped_column(String(100), nullable=True)
     postal_code: Mapped[Optional[str]] = mapped_column(String(20), nullable=True)
-    country: Mapped[str] = mapped_column(String(100), default="India", nullable=False)
-    timezone: Mapped[str] = mapped_column(String(50), default="Asia/Kolkata", nullable=False)
+    country: Mapped[Optional[str]] = mapped_column(String(100), default="India", server_default="India", nullable=True)
+    timezone: Mapped[Optional[str]] = mapped_column(String(50), default="Asia/Kolkata", server_default="Asia/Kolkata", nullable=True)
     tax_id: Mapped[Optional[str]] = mapped_column(String(50), nullable=True)
-    status: Mapped[str] = mapped_column(String(50), default="active", nullable=False)  # active, suspended
+    billing_address: Mapped[Optional[str]] = mapped_column(String(500), nullable=True)
+    state_code: Mapped[Optional[str]] = mapped_column(String(10), nullable=True)
+    gstin: Mapped[Optional[str]] = mapped_column(String(50), nullable=True)
+    segment: Mapped[Optional[str]] = mapped_column(String(50), nullable=True)
+    status: Mapped[str] = mapped_column(String(50), default="active", server_default="active", nullable=False)  # active, suspended
 
     user: Mapped[Optional["User"]] = relationship("User", back_populates="customer")
     quotations: Mapped[List["Quotation"]] = relationship("Quotation", back_populates="customer")

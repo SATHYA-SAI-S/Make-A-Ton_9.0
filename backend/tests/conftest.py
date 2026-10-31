@@ -31,7 +31,7 @@ import app.overdue.models
 from app.taxes.models import BillingSettings
 from app.shared.registry import get_port
 
-from app.core.database import Base, engine, SessionLocal, get_db
+from app.core.database import Base, engine, SessionLocal, get_db, create_all_tables
 from app.core.security import hash_password, create_access_token
 from app.auth.models import User
 from app.customers.models import Customer
@@ -46,8 +46,9 @@ def setup_test_environment():
 
 @pytest.fixture(autouse=True)
 def auto_db_setup():
+    app.dependency_overrides.clear()
     Base.metadata.drop_all(bind=engine)
-    Base.metadata.create_all(bind=engine)
+    create_all_tables(bind=engine)
     db = SessionLocal()
     if BillingSettings is not None:
         if not db.query(BillingSettings).filter_by(id="default").first():
@@ -58,13 +59,20 @@ def auto_db_setup():
     if get_port is not None:
         try:
             sub_port = get_port("subscription")
-            if hasattr(sub_port, "subscriptions"):
-                sub_port.subscriptions.clear()
+            if hasattr(sub_port, "reset"):
+                sub_port.reset()
+            inv_port = get_port("invoice")
+            if hasattr(inv_port, "reset"):
+                inv_port.reset()
+            cust_port = get_port("customer")
+            if hasattr(cust_port, "reset"):
+                cust_port.reset()
         except Exception:
             pass
 
     yield
 
+    app.dependency_overrides.clear()
     Base.metadata.drop_all(bind=engine)
 
 

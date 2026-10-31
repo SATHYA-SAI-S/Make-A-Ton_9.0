@@ -37,15 +37,20 @@ def override_get_db():
     finally:
         db.close()
 
-app.dependency_overrides[get_db] = override_get_db
-client = TestClient(app)
-
 @pytest.fixture(scope="module", autouse=True)
 def setup_database():
     Base.metadata.create_all(bind=test_engine)
     bootstrap_audit()
     yield
     Base.metadata.drop_all(bind=test_engine)
+
+@pytest.fixture(autouse=True)
+def apply_override():
+    app.dependency_overrides[get_db] = override_get_db
+    yield
+    app.dependency_overrides.pop(get_db, None)
+
+client = TestClient(app)
 
 def test_customer_submits_upgrade_request():
     headers_cust = {"Authorization": "Bearer dev-customer-token"}
