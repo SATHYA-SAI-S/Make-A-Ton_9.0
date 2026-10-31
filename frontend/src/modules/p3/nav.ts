@@ -14,5 +14,7 @@ export const nav: NavItem[] = [
   { label: 'Revenue Analytics', path: '/p3/finance/revenue', module: 'p3' },
   { label: 'Subscription Analytics', path: '/p3/finance/subscriptions', module: 'p3' },
   { label: 'Collection & Risk', path: '/p3/finance/collections', module: 'p3' },
+  { label: 'Cohort Retention', path: '/p3/finance/cohorts', module: 'p3' },
+  { label: 'Revenue Concentration', path: '/p3/finance/concentration', module: 'p3' },
   { label: 'UI Demo', path: '/ui-demo', module: 'p3' },
 ];

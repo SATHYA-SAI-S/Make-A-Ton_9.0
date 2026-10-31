@@ -12,6 +12,8 @@ import { RevenueAnalytics } from './pages/finance/RevenueAnalytics';
 import { SubscriptionAnalytics } from './pages/finance/SubscriptionAnalytics';
 import { CollectionAnalytics } from './pages/finance/CollectionAnalytics';
 import { DrilldownInvoices } from './pages/finance/DrilldownInvoices';
+import { CohortRetentionPage } from './pages/finance/CohortRetentionPage';
+import { RevenueConcentrationPage } from './pages/finance/RevenueConcentrationPage';
 
 export const routes: RouteObject[] = [
   {
@@ -69,5 +71,13 @@ export const routes: RouteObject[] = [
   {
     path: '/p3/finance/invoices',
     element: <DrilldownInvoices />,
+  },
+  {
+    path: '/p3/finance/cohorts',
+    element: <CohortRetentionPage />,
+  },
+  {
+    path: '/p3/finance/concentration',
+    element: <RevenueConcentrationPage />,
   },
 ];

@@ -9,6 +9,11 @@ from sqlalchemy.orm import Session
 
 from backend.app.core.database import get_db
 from backend.app.core.security import UserClaims, require_roles
+from backend.app.finance.cohorts import (
+    get_cohort_cell_customers,
+    get_cohort_retention_matrix,
+)
+from backend.app.finance.concentration import get_detailed_revenue_concentration
 from backend.app.finance.collections import (
     get_collection_funnel,
     get_forecast_baseline,
@@ -102,20 +107,32 @@ def chart_mrr_waterfall(
 @charts_router.get("/cohorts", summary="Chart 7: Cohort Retention Heatmap")
 def chart_cohorts(
     lookback_months: int = Query(6, ge=1, le=24, description="Lookback months"),
+    max_offsets: int = Query(6, ge=1, le=12, description="Max offset intervals"),
     current_user: UserClaims = Depends(require_roles("admin", "staff")),
     db: Session = Depends(get_db),
 ):
-    return get_cohort_retention(db=db, lookback_months=lookback_months)
+    return get_cohort_retention_matrix(db=db, lookback_months=lookback_months, max_offsets=max_offsets)
+
+
+@charts_router.get("/cohorts/cell-customers", summary="Drilldown: Customers in Cohort Cell")
+def chart_cohort_cell_customers(
+    cohort: str = Query(..., description="Cohort month (YYYY-MM)"),
+    offset: int = Query(0, ge=0, le=24, description="Month offset"),
+    current_user: UserClaims = Depends(require_roles("admin", "staff")),
+    db: Session = Depends(get_db),
+):
+    return get_cohort_cell_customers(db=db, cohort=cohort, offset=offset)
 
 
 # 8. Revenue concentration
 @charts_router.get("/concentration", summary="Chart 8: Revenue & MRR Pareto Concentration")
 def chart_concentration(
     top_n: int = Query(10, ge=1, le=50, description="Top N customers"),
+    sort_by: str = Query("mrr", description="Sort by 'mrr' or 'revenue'"),
     current_user: UserClaims = Depends(require_roles("admin", "staff")),
     db: Session = Depends(get_db),
 ):
-    return get_revenue_concentration(db=db, top_n=top_n)
+    return get_detailed_revenue_concentration(db=db, top_n=top_n, sort_by=sort_by)
 
 
 # 9. Payment collection funnel
