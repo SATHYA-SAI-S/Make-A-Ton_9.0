@@ -6,6 +6,7 @@ from sqlalchemy import String, Boolean, DateTime, Uuid, Index, Integer, ForeignK
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from app.core.database import Base, TimestampMixin
+import app.customers.models  # noqa: F401
 
 
 class User(Base, TimestampMixin):

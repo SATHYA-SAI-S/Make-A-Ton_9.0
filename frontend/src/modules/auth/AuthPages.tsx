@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { useAuth } from "../../context/AuthContext";
+import { FintechSphere3D } from "../../components/3d/FintechSphere3D";
 import {
   Check,
   X,
@@ -13,7 +14,8 @@ import {
   ArrowLeft,
   RefreshCw,
   Clock,
-  ShieldCheck
+  ShieldCheck,
+  ExternalLink
 } from "lucide-react";
 
 type AuthMode =
@@ -191,9 +193,10 @@ export const AuthPage: React.FC = () => {
     e.preventDefault();
     resetMessages();
     setLoading(true);
+    const cleanEmail = email.trim().toLowerCase();
     try {
-      const resp = await forgotPassword(email);
-      setMaskedEmail(resp.masked_email || email);
+      const resp = await forgotPassword(cleanEmail);
+      setMaskedEmail(resp.masked_email || cleanEmail);
       setSuccessMsg(resp.message || "If registered, a verification code has been dispatched.");
       setExpirySeconds(600);
       setCooldownSeconds(60);
@@ -211,8 +214,9 @@ export const AuthPage: React.FC = () => {
     if (cooldownSeconds > 0) return;
     resetMessages();
     setLoading(true);
+    const cleanEmail = email.trim().toLowerCase();
     try {
-      const resp = await resendForgotPasswordOtp(email);
+      const resp = await resendForgotPasswordOtp(cleanEmail);
       setSuccessMsg(resp.message || "A fresh verification code has been dispatched.");
       setExpirySeconds(600);
       setCooldownSeconds(60);
@@ -235,8 +239,9 @@ export const AuthPage: React.FC = () => {
     }
 
     setLoading(true);
+    const cleanEmail = email.trim().toLowerCase();
     try {
-      const resp = await verifyForgotPasswordOtp(email, resetOtp.trim());
+      const resp = await verifyForgotPasswordOtp(cleanEmail, resetOtp.trim());
       setResetToken(resp.reset_token);
       setSuccessMsg("Verification code confirmed! Please set your new password.");
       setMode("reset-new-password");
@@ -263,8 +268,9 @@ export const AuthPage: React.FC = () => {
     }
 
     setLoading(true);
+    const cleanEmail = email.trim().toLowerCase();
     try {
-      await confirmResetPassword(email, resetToken, newPassword);
+      await confirmResetPassword(cleanEmail, resetToken, newPassword);
       setSuccessMsg("Password updated successfully! Please sign in with your new password.");
       setPassword("");
       setNewPassword("");
@@ -285,9 +291,71 @@ export const AuthPage: React.FC = () => {
   };
 
   return (
-    <div className="min-h-screen w-full flex items-center justify-center bg-slate-950 p-4">
-      <div className="w-full max-w-md bg-slate-900 border border-slate-800 rounded-2xl p-8 shadow-2xl">
-        {/* Brand Header */}
+    <div className="min-h-screen w-full flex items-center justify-center bg-[#070b12] text-slate-100 p-4 lg:p-8 relative overflow-hidden">
+      {/* Background glow effects */}
+      <div className="absolute top-1/4 left-1/4 -translate-x-1/2 -translate-y-1/2 w-96 h-96 bg-emerald-500/10 rounded-full blur-3xl pointer-events-none" />
+      <div className="absolute bottom-1/4 right-1/4 translate-x-1/2 translate-y-1/2 w-96 h-96 bg-cyan-500/10 rounded-full blur-3xl pointer-events-none" />
+
+      <div className="w-full max-w-6xl grid grid-cols-1 lg:grid-cols-12 gap-8 items-center relative z-10">
+        {/* Left Column: 3D Visual Hero */}
+        <div className="lg:col-span-7 flex flex-col justify-center space-y-6">
+          <div className="space-y-2">
+            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 text-xs font-mono">
+              <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
+              SubscriptIQ Core v1.0 • Live Financial Telemetry
+            </div>
+            <h1 className="text-3xl lg:text-5xl font-extrabold text-white tracking-tight leading-tight">
+              Subscription-to-Cash <br />
+              <span className="text-transparent bg-clip-text bg-gradient-to-r from-emerald-400 via-teal-300 to-cyan-400">
+                Autonomous Intelligence
+              </span>
+            </h1>
+            <p className="text-sm text-slate-400 max-w-md leading-relaxed">
+              Enterprise subscription lifecycle engine with dynamic variant pricing, quotation snapshots, automated recurring billing contracts, and cryptographic role-based access.
+            </p>
+          </div>
+
+          {/* 3D Interactive Scene Container */}
+          <div className="relative w-full h-[360px] lg:h-[420px] rounded-2xl bg-gradient-to-b from-slate-900/60 to-slate-950/80 border border-slate-800/80 shadow-2xl backdrop-blur-md overflow-hidden">
+            <FintechSphere3D className="w-full h-full" accentColor="emerald" />
+
+            {/* Floating Telemetry Badges */}
+            <div className="absolute top-4 left-4 p-2.5 rounded-xl bg-slate-950/80 border border-slate-800/80 backdrop-blur-md text-xs space-y-0.5 pointer-events-none shadow-lg">
+              <div className="text-[10px] text-slate-400 uppercase font-mono">Real-Time Core</div>
+              <div className="text-emerald-400 font-semibold font-mono flex items-center gap-1.5">
+                <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-ping" />
+                Active Contracts Sync
+              </div>
+            </div>
+
+            <div className="absolute bottom-4 right-4 p-2.5 rounded-xl bg-slate-950/80 border border-slate-800/80 backdrop-blur-md text-xs space-y-0.5 pointer-events-none shadow-lg">
+              <div className="text-[10px] text-slate-400 uppercase font-mono">Security Layer</div>
+              <div className="text-cyan-400 font-semibold font-mono">
+                Argon2id + SHA-256 OTP
+              </div>
+            </div>
+          </div>
+
+          {/* Key capability pills */}
+          <div className="grid grid-cols-3 gap-3">
+            <div className="p-3 rounded-xl bg-slate-900/40 border border-slate-800/60 backdrop-blur-sm text-center">
+              <div className="text-lg font-bold text-white font-mono">100%</div>
+              <div className="text-[11px] text-slate-400">Exact Decimals</div>
+            </div>
+            <div className="p-3 rounded-xl bg-slate-900/40 border border-slate-800/60 backdrop-blur-sm text-center">
+              <div className="text-lg font-bold text-white font-mono">0.0ms</div>
+              <div className="text-[11px] text-slate-400">Lock Drift</div>
+            </div>
+            <div className="p-3 rounded-xl bg-slate-900/40 border border-slate-800/60 backdrop-blur-sm text-center">
+              <div className="text-lg font-bold text-emerald-400 font-mono">:8025</div>
+              <div className="text-[11px] text-slate-400">Mailpit Verified</div>
+            </div>
+          </div>
+        </div>
+
+        {/* Right Column: Form Container */}
+        <div className="lg:col-span-5 w-full bg-slate-900/90 border border-slate-800 rounded-2xl p-6 sm:p-8 shadow-2xl backdrop-blur-xl">
+          {/* Brand Header */}
         <div className="text-center mb-6">
           <div className="w-12 h-12 rounded-xl bg-emerald-500 text-white font-bold text-2xl flex items-center justify-center mx-auto mb-3 shadow-lg shadow-emerald-500/20">
             S
@@ -575,6 +643,28 @@ export const AuthPage: React.FC = () => {
               </div>
             </div>
 
+            {/* Mailpit local email testing tip */}
+            <div className="p-3 bg-emerald-500/10 border border-emerald-500/20 rounded-xl text-xs text-emerald-300 space-y-1">
+              <div className="flex items-center justify-between font-semibold text-emerald-400">
+                <span className="flex items-center gap-1.5">
+                  <Mail size={13} />
+                  Local Mailpit Testing Inbox
+                </span>
+                <span className="text-[10px] bg-emerald-500/20 px-1.5 py-0.5 rounded text-emerald-300 font-mono">:8025</span>
+              </div>
+              <p className="text-[11px] text-slate-400">
+                The 6-digit password reset OTP will be delivered immediately to your local Mailpit web inbox:
+              </p>
+              <a
+                href="http://127.0.0.1:8025"
+                target="_blank"
+                rel="noreferrer"
+                className="inline-flex items-center gap-1 text-[11px] font-mono text-emerald-400 hover:text-emerald-300 underline pt-0.5"
+              >
+                http://127.0.0.1:8025 <ExternalLink size={11} />
+              </a>
+            </div>
+
             <button
               type="submit"
               disabled={loading}
@@ -601,7 +691,7 @@ export const AuthPage: React.FC = () => {
         {/* 5. VERIFY FORGOT PASSWORD OTP (Step 2) */}
         {mode === "verify-reset" && (
           <form onSubmit={handleVerifyResetOtpSubmit} className="space-y-4">
-            <div className="p-3 bg-blue-500/10 border border-blue-500/20 rounded-lg text-xs text-blue-300 space-y-1">
+            <div className="p-3 bg-blue-500/10 border border-blue-500/20 rounded-lg text-xs text-blue-300 space-y-2">
               <div className="flex items-center gap-2 font-semibold text-blue-400">
                 <ShieldCheck size={16} />
                 Password Reset Verification Code
@@ -610,9 +700,19 @@ export const AuthPage: React.FC = () => {
                 Enter the six-digit verification code sent to:
               </p>
               <p className="font-mono font-bold text-white tracking-wide">{maskedEmail}</p>
-              <div className="flex items-center gap-1.5 pt-1 text-slate-400 font-mono text-[11px]">
-                <Clock size={13} className="text-amber-400" />
-                <span>Code expires in: <strong className="text-amber-400">{formatTimer(expirySeconds)}</strong></span>
+              <div className="flex items-center justify-between pt-1 border-t border-blue-500/20 text-[11px]">
+                <div className="flex items-center gap-1.5 text-slate-400 font-mono">
+                  <Clock size={13} className="text-amber-400" />
+                  <span>Expires: <strong className="text-amber-400">{formatTimer(expirySeconds)}</strong></span>
+                </div>
+                <a
+                  href="http://127.0.0.1:8025"
+                  target="_blank"
+                  rel="noreferrer"
+                  className="text-blue-400 hover:text-blue-300 underline flex items-center gap-1"
+                >
+                  Check Mailpit :8025 <ExternalLink size={11} />
+                </a>
               </div>
             </div>
 
@@ -808,5 +908,7 @@ export const AuthPage: React.FC = () => {
         </div>
       </div>
     </div>
+  </div>
   );
 };
+

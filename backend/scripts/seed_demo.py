@@ -41,6 +41,12 @@ def seed_demo_data():
             db.add(admin)
             db.flush()
             print("  Created Admin: admin@example.com")
+        else:
+            admin.role = "admin"
+            admin.password_hash = hash_password("Admin@Secure123!")
+            admin.is_active = True
+            db.flush()
+            print("  Refreshed Admin: admin@example.com (role=admin)")
 
         # 2. Staff User
         staff = db.scalar(select(User).where(func.lower(User.email) == "staff@example.com"))
@@ -54,6 +60,12 @@ def seed_demo_data():
             db.add(staff)
             db.flush()
             print("  Created Staff: staff@example.com")
+        else:
+            staff.role = "staff"
+            staff.password_hash = hash_password("Staff@Secure123!")
+            staff.is_active = True
+            db.flush()
+            print("  Refreshed Staff: staff@example.com (role=staff)")
 
         # 3. Customer 1: Acme Enterprise Corp (with Portal Login)
         cust1_user = db.scalar(select(User).where(func.lower(User.email) == "acme@example.com"))
@@ -65,6 +77,11 @@ def seed_demo_data():
                 is_active=True
             )
             db.add(cust1_user)
+            db.flush()
+        else:
+            cust1_user.role = "customer"
+            cust1_user.password_hash = hash_password("Customer@Secure123!")
+            cust1_user.is_active = True
             db.flush()
 
         cust1 = db.scalar(select(Customer).where(func.lower(Customer.email) == "acme@example.com"))
