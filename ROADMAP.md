@@ -18,10 +18,10 @@
 - [x] Automated tests: test_taxes.py
 
 ## Phase 4: Discount Rules & Eligibility (P2-T03)
-- [ ] Discount rules and redemptions models
-- [ ] Concurrency-safe eligibility service with row locking (SELECT ... FOR UPDATE)
-- [ ] Discount performance reporting endpoint GET /api/v1/discounts/performance
-- [ ] Automated tests: test_discounts.py
+- [x] Discount rules and redemptions models
+- [x] Concurrency-safe eligibility service with row locking (SELECT ... FOR UPDATE)
+- [x] Discount performance reporting endpoint GET /api/v1/discounts/performance
+- [x] Automated tests: test_discounts.py
 
 ## Phase 5: Pricing Calculator (P2-T04)
 - [ ] Pure logic Decimal pricing calculator in billing/calculator.py
