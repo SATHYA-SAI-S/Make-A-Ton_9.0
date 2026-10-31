@@ -28,45 +28,74 @@ const DashboardLayout: React.FC = () => {
   }, [role]);
 
   return (
-    <div className="flex min-h-screen w-full bg-slate-50">
+    <div className="flex min-h-screen w-full bg-[#070b12] text-slate-100">
       <Sidebar currentTab={currentTab} onSelectTab={setCurrentTab} />
-      <main className="flex-1 overflow-y-auto">
-        {/* Customer View */}
-        {role === "customer" && <CustomerPortalPage />}
+      <div className="flex-1 flex flex-col min-w-0 overflow-hidden">
+        {/* Top Navbar */}
+        <header className="h-14 border-b border-slate-800/80 bg-slate-900/60 backdrop-blur-md px-6 flex items-center justify-between shrink-0">
+          <div className="flex items-center gap-2.5">
+            <span className="text-xs font-mono text-slate-400 uppercase tracking-wider">{role}</span>
+            <span className="text-slate-600">/</span>
+            <span className="text-xs font-semibold text-white capitalize">{currentTab.replace("-", " ")}</span>
+          </div>
 
-        {/* Staff Views */}
-        {role === "staff" && (
-          <>
-            {currentTab === "staff-dashboard" && <StaffDashboard onNavigate={setCurrentTab} />}
-            {currentTab === "customers" && <CustomersPage />}
-            {currentTab === "catalogue" && <CataloguePage />}
-            {currentTab === "plans" && <PlansPage />}
-            {currentTab === "quotations" && <QuotationsPage />}
-            {currentTab === "subscriptions" && <SubscriptionsPage />}
-            {/* If tab not allowed for staff, fallback to staff-dashboard */}
-            {["dashboard", "staff", "portal"].includes(currentTab) && (
-              <StaffDashboard onNavigate={setCurrentTab} />
-            )}
-          </>
-        )}
+          <div className="flex items-center gap-3">
+            <div className="hidden sm:flex items-center gap-2 px-2.5 py-1 rounded-full bg-slate-950/80 border border-slate-800 text-[11px] font-mono">
+              <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
+              <span className="text-slate-400">Core API:</span>
+              <span className="text-emerald-400">8000</span>
+            </div>
+            <a
+              href="http://127.0.0.1:8025"
+              target="_blank"
+              rel="noreferrer"
+              className="flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-slate-950/80 border border-slate-800 hover:border-cyan-500/40 text-[11px] font-mono text-slate-300 hover:text-white transition-colors"
+            >
+              <span className="w-1.5 h-1.5 rounded-full bg-cyan-400" />
+              <span>Mailpit</span>
+              <span className="text-cyan-400">:8025 ↗</span>
+            </a>
+          </div>
+        </header>
 
-        {/* Admin Views */}
-        {role === "admin" && (
-          <>
-            {currentTab === "dashboard" && <AdminDashboard onNavigate={setCurrentTab} />}
-            {currentTab === "customers" && <CustomersPage />}
-            {currentTab === "catalogue" && <CataloguePage />}
-            {currentTab === "plans" && <PlansPage />}
-            {currentTab === "quotations" && <QuotationsPage />}
-            {currentTab === "subscriptions" && <SubscriptionsPage />}
-            {currentTab === "staff" && <StaffPage />}
-            {/* If admin navigates to non-admin tab */}
-            {["staff-dashboard", "portal"].includes(currentTab) && (
-              <AdminDashboard onNavigate={setCurrentTab} />
-            )}
-          </>
-        )}
-      </main>
+        <main className="flex-1 overflow-y-auto bg-gradient-to-b from-[#070b12] to-[#0a0f1d]">
+          {/* Customer View */}
+          {role === "customer" && <CustomerPortalPage />}
+
+          {/* Staff Views */}
+          {role === "staff" && (
+            <>
+              {currentTab === "staff-dashboard" && <StaffDashboard onNavigate={setCurrentTab} />}
+              {currentTab === "customers" && <CustomersPage />}
+              {currentTab === "catalogue" && <CataloguePage />}
+              {currentTab === "plans" && <PlansPage />}
+              {currentTab === "quotations" && <QuotationsPage />}
+              {currentTab === "subscriptions" && <SubscriptionsPage />}
+              {/* If tab not allowed for staff, fallback to staff-dashboard */}
+              {["dashboard", "staff", "portal"].includes(currentTab) && (
+                <StaffDashboard onNavigate={setCurrentTab} />
+              )}
+            </>
+          )}
+
+          {/* Admin Views */}
+          {role === "admin" && (
+            <>
+              {currentTab === "dashboard" && <AdminDashboard onNavigate={setCurrentTab} />}
+              {currentTab === "customers" && <CustomersPage />}
+              {currentTab === "catalogue" && <CataloguePage />}
+              {currentTab === "plans" && <PlansPage />}
+              {currentTab === "quotations" && <QuotationsPage />}
+              {currentTab === "subscriptions" && <SubscriptionsPage />}
+              {currentTab === "staff" && <StaffPage />}
+              {/* If admin navigates to non-admin tab */}
+              {["staff-dashboard", "portal"].includes(currentTab) && (
+                <AdminDashboard onNavigate={setCurrentTab} />
+              )}
+            </>
+          )}
+        </main>
+      </div>
     </div>
   );
 };

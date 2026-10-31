@@ -88,16 +88,40 @@ export const Sidebar: React.FC<SidebarProps> = ({ currentTab, onSelectTab }) => 
         </nav>
       </div>
 
-      <div className="p-4 border-t border-slate-800">
-        <div className="mb-3 px-2">
-          <span className="text-[10px] uppercase font-semibold text-slate-500 tracking-wider block">Logged in as</span>
-          <p className="text-xs text-slate-300 font-medium truncate">{user?.email}</p>
+      <div className="p-4 border-t border-slate-800 space-y-3">
+        {/* Service status indicators */}
+        <div className="px-2 py-2 bg-slate-950/60 border border-slate-800/80 rounded-xl space-y-1.5 text-[11px] font-mono">
+          <div className="flex items-center justify-between text-slate-400">
+            <span className="flex items-center gap-1.5">
+              <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
+              API Server
+            </span>
+            <span className="text-emerald-400">:8000</span>
+          </div>
+          <a
+            href="http://127.0.0.1:8025"
+            target="_blank"
+            rel="noreferrer"
+            className="flex items-center justify-between text-slate-400 hover:text-white transition-colors"
+          >
+            <span className="flex items-center gap-1.5">
+              <span className="w-1.5 h-1.5 rounded-full bg-cyan-400" />
+              Mailpit Inbox
+            </span>
+            <span className="text-cyan-400 hover:underline">:8025 ↗</span>
+          </a>
         </div>
+
+        <div className="px-2">
+          <span className="text-[10px] uppercase font-semibold text-slate-500 tracking-wider block">Logged in as</span>
+          <p className="text-xs text-slate-200 font-medium truncate">{user?.email}</p>
+        </div>
+
         <button
           onClick={logout}
-          className="w-full flex items-center gap-2 px-3 py-2 text-sm text-rose-400 hover:text-rose-300 hover:bg-rose-950/30 rounded-lg transition-colors"
+          className="w-full flex items-center gap-2 px-3 py-2 text-xs font-medium text-rose-400 hover:text-rose-300 hover:bg-rose-950/30 rounded-xl transition-colors border border-rose-900/20"
         >
-          <LogOut size={16} />
+          <LogOut size={14} />
           <span>Sign Out</span>
         </button>
       </div>

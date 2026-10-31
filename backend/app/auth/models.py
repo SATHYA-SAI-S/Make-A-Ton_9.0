@@ -56,3 +56,7 @@ class PasswordResetOTP(Base, TimestampMixin):
     reset_token_hash: Mapped[Optional[str]] = mapped_column(String(64), nullable=True)
     reset_token_expires_at: Mapped[Optional[datetime]] = mapped_column(DateTime(timezone=True), nullable=True)
 
+
+# Ensure dependent Customer model is registered in SQLAlchemy mapper registry
+import app.customers.models  # noqa: F401
+

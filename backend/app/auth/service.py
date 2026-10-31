@@ -1,8 +1,11 @@
 import uuid
+import logging
 from datetime import datetime, timedelta, timezone
 from typing import Optional, List, Tuple
 from sqlalchemy.orm import Session
 from sqlalchemy import select, func
+
+logger = logging.getLogger("subscriptiq.auth")
 
 from app.core.config import settings
 from app.core.security import (
@@ -360,10 +363,14 @@ def initiate_password_reset(db: Session, email: str) -> ForgotPasswordResponse:
     now = datetime.now(timezone.utc)
 
     if user and user.is_active:
-        # Check cooldown on existing reset request
-        existing_reset = db.scalar(select(PasswordResetOTP).where(PasswordResetOTP.email == normalized_email))
+        # Check cooldown on existing reset request (case-insensitive)
+        existing_reset = db.scalar(
+            select(PasswordResetOTP).where(func.lower(PasswordResetOTP.email) == normalized_email)
+        )
         if existing_reset:
-            last_sent = existing_reset.last_sent_at.replace(tzinfo=timezone.utc if existing_reset.last_sent_at.tzinfo is None else existing_reset.last_sent_at.tzinfo)
+            last_sent = existing_reset.last_sent_at.replace(
+                tzinfo=timezone.utc if existing_reset.last_sent_at.tzinfo is None else existing_reset.last_sent_at.tzinfo
+            )
             elapsed = (now - last_sent).total_seconds()
             if elapsed < settings.OTP_RESEND_COOLDOWN_SECONDS:
                 remaining = int(settings.OTP_RESEND_COOLDOWN_SECONDS - elapsed)
@@ -377,12 +384,17 @@ def initiate_password_reset(db: Session, email: str) -> ForgotPasswordResponse:
         hashed_otp = hash_otp(otp)
         expires_at = now + timedelta(minutes=settings.OTP_EXPIRE_MINUTES)
 
-        # Dispatch email
-        recipient_name = user.customer.name if user.customer else "Valued Customer"
-        send_password_reset_otp_email(user.email, recipient_name, otp)
+        # Retrieve recipient name safely without triggering detached/lazy mapper resolution errors
+        customer = db.scalar(select(Customer).where(Customer.user_id == user.id))
+        recipient_name = customer.name if (customer and customer.name) else "Valued Customer"
+
+        # Dispatch email to normalized address
+        send_password_reset_otp_email(normalized_email, recipient_name, otp)
+        logger.info(f"Dispatched password reset OTP to: {normalized_email}")
 
         # Upsert PasswordResetOTP record
         if existing_reset:
+            existing_reset.email = normalized_email
             existing_reset.otp_hash = hashed_otp
             existing_reset.expires_at = expires_at
             existing_reset.attempts = 0
@@ -391,7 +403,7 @@ def initiate_password_reset(db: Session, email: str) -> ForgotPasswordResponse:
             existing_reset.reset_token_expires_at = None
         else:
             new_reset = PasswordResetOTP(
-                email=user.email,
+                email=normalized_email,
                 user_id=user.id,
                 otp_hash=hashed_otp,
                 expires_at=expires_at,
@@ -406,6 +418,8 @@ def initiate_password_reset(db: Session, email: str) -> ForgotPasswordResponse:
         user.reset_token_expires_at = expires_at
 
         db.commit()
+    else:
+        logger.warning(f"Password reset requested for unregistered or inactive email: {normalized_email}")
 
     return ForgotPasswordResponse(
         message="If your email is registered in our system, a 6-digit verification code has been dispatched.",
@@ -426,7 +440,9 @@ def verify_password_reset_otp(db: Session, email: str, otp: str) -> VerifyResetO
     and returns a short-lived reset authorization token.
     """
     normalized_email = email.lower().strip()
-    reset_rec = db.scalar(select(PasswordResetOTP).where(PasswordResetOTP.email == normalized_email))
+    reset_rec = db.scalar(
+        select(PasswordResetOTP).where(func.lower(PasswordResetOTP.email) == normalized_email)
+    )
 
     if not reset_rec:
         raise ValidationException(
@@ -515,7 +531,7 @@ def complete_password_reset_with_token(
     # Find reset record
     reset_rec = db.scalar(
         select(PasswordResetOTP).where(
-            PasswordResetOTP.email == normalized_email,
+            func.lower(PasswordResetOTP.email) == normalized_email,
             PasswordResetOTP.reset_token_hash == token_hashed
         )
     )
