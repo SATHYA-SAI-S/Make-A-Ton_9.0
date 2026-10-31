@@ -16,6 +16,8 @@ import app.subscriptions.models
 from app.auth.router import auth_router, staff_router
 from app.customers.router import customers_router
 from app.catalogue.router import catalogue_router
+from app.quotations.router import quotations_router
+from app.subscriptions.router import subscriptions_router, internal_subscriptions_router
 
 
 @asynccontextmanager
@@ -53,8 +55,11 @@ def health_check():
         "environment": settings.ENVIRONMENT
     }
 
-# Register Routers
+# Register Routers under /api/v1
 app.include_router(auth_router, prefix=settings.API_V1_PREFIX)
 app.include_router(staff_router, prefix=settings.API_V1_PREFIX)
 app.include_router(customers_router, prefix=settings.API_V1_PREFIX)
 app.include_router(catalogue_router, prefix=settings.API_V1_PREFIX)
+app.include_router(quotations_router, prefix=settings.API_V1_PREFIX)
+app.include_router(subscriptions_router, prefix=settings.API_V1_PREFIX)
+app.include_router(internal_subscriptions_router, prefix=settings.API_V1_PREFIX)
