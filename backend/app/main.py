@@ -14,11 +14,12 @@ import app.quotations.models
 import app.subscriptions.models
 
 from app.auth.router import auth_router, staff_router
+from app.customers.router import customers_router
+from app.catalogue.router import catalogue_router
 
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
-    # Ensure tables exist
     Base.metadata.create_all(bind=engine)
     yield
 
@@ -55,3 +56,5 @@ def health_check():
 # Register Routers
 app.include_router(auth_router, prefix=settings.API_V1_PREFIX)
 app.include_router(staff_router, prefix=settings.API_V1_PREFIX)
+app.include_router(customers_router, prefix=settings.API_V1_PREFIX)
+app.include_router(catalogue_router, prefix=settings.API_V1_PREFIX)
